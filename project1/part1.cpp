@@ -1,11 +1,15 @@
 #include <iostream>
 #include <vector>
 
+extern "C"
+{
 #include <malloc.h>
-
-#include <cstdio>
+#include <stdint.h>
 #include <pthread.h>
 #include <errno.h>
+}
+
+#include <cstdio>
 #include <boost/lexical_cast.hpp>
 
 using namespace std;
@@ -51,7 +55,12 @@ void *worker_thread(void *threadnum)
     uint32_t *tnum = (uint32_t *) threadnum;
     cout << "In thread... " << *tnum << endl;
     for(uint32_t i=0 ; i< 10000; i++) {
-        counter++;
+        uint32_t local;
+        local = counter;
+        usleep(1);
+        local++;
+
+        counter = local;
     }
     delete tnum;
     return NULL;
