@@ -12,6 +12,8 @@ using namespace std;
 
 void *worker_thread(void *threadnum);
 
+uint32_t counter = 0;
+
 int main(int argc, char ** argv)
 {
     uint32_t num_threads;
@@ -35,8 +37,12 @@ int main(int argc, char ** argv)
             return -1;
         }
         v.push_back(p);
-
     }
+
+    for (uint32_t i=0; i < num_threads; i++)
+        pthread_join(v[i], NULL);
+
+    cout << "counter is: " << counter << endl;
 }
 
 
@@ -44,6 +50,9 @@ void *worker_thread(void *threadnum)
 {
     uint32_t *tnum = (uint32_t *) threadnum;
     cout << "In thread... " << *tnum << endl;
+    for(uint32_t i=0 ; i< 10000; i++) {
+        counter++;
+    }
     delete tnum;
     return NULL;
 }
