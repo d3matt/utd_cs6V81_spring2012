@@ -11,7 +11,7 @@ ifeq ($(HIDE),)
 HIDE:= @
 endif
 
-BINLIST=part1 part2
+BINLIST=part1 part2 part3
 
 COMMON_OBJECTS = 
 
@@ -31,6 +31,10 @@ part1: part1.o
 	$(HIDE) $(LD) $(LDFLAGS) -o $@ $^
 
 part2: part2.o
+	@ echo LD $@
+	$(HIDE) $(LD) $(LDFLAGS) -o $@ $^
+
+part3: part3.o
 	@ echo LD $@
 	$(HIDE) $(LD) $(LDFLAGS) -o $@ $^
 
