@@ -17,6 +17,7 @@ using namespace std;
 void *worker_thread(void *threadnum);
 
 uint32_t counter = 0;
+pthread_mutex_t M;
 
 int main(int argc, char ** argv)
 {
@@ -28,6 +29,9 @@ int main(int argc, char ** argv)
         return -1;
     }
     num_threads = boost::lexical_cast<uint32_t>(argv[1]);
+
+    cout << "initializing mutex" << endl;
+    pthread_mutex_init(&M, NULL);
     cout << "Spawning " << num_threads << " threads." << endl;
 
     for (uint32_t i = 0; i < num_threads; i++)
@@ -36,7 +40,6 @@ int main(int argc, char ** argv)
         uint32_t * num = new uint32_t;
         *num=i;
         printf("Creating thread %d\n", *num);
-        cout << "creating thread " << i << endl;
         if ( pthread_create(&p, NULL, worker_thread, num) ) {
             perror("pthread_create()");
             return -1;
@@ -48,6 +51,7 @@ int main(int argc, char ** argv)
         pthread_join(v[i], NULL);
 
     cout << "counter is: " << counter << endl;
+    pthread_mutex_destroy(&M);
 }
 
 
@@ -55,13 +59,10 @@ void *worker_thread(void *threadnum)
 {
     uint32_t *tnum = (uint32_t *) threadnum;
     printf("Start of thread %d\n", *tnum);
-    for(uint32_t i=0 ; i< 10000; i++) {
-        uint32_t local;
-        local = counter;
-        //usleep(1);
-        local++;
-
-        counter = local;
+    for(uint32_t i=0 ; i < 10000; i++) {
+        pthread_mutex_lock(&M);
+        counter++;
+        pthread_mutex_unlock(&M);
     }
     printf("End of thread %d\n", *tnum);
     delete tnum;

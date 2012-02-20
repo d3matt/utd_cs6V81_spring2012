@@ -11,7 +11,7 @@ ifeq ($(HIDE),)
 HIDE:= @
 endif
 
-BINLIST=part1
+BINLIST=part1 part2
 
 COMMON_OBJECTS = 
 
@@ -27,6 +27,10 @@ default: $(BINLIST)
 -include .depend/*.d
 
 part1: part1.o
+	@ echo LD $@
+	$(HIDE) $(LD) $(LDFLAGS) -o $@ $^
+
+part2: part2.o
 	@ echo LD $@
 	$(HIDE) $(LD) $(LDFLAGS) -o $@ $^
 
