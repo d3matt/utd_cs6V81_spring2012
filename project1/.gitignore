@@ -1,0 +1,6 @@
+.*.swp
+.swp
+.depend
+*.o
+*.exe
+part1
