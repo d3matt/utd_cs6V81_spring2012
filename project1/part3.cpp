@@ -29,22 +29,25 @@ class FullException : public exception
 class Lock {
 private:
     pthread_mutex_t lock_;
+    pthread_cond_t cond_;
 public:
-    Lock() {pthread_mutex_init(&lock_, 0);}
-    ~Lock() {pthread_mutex_destroy(&lock_);}
+    Lock() {pthread_mutex_init(&lock_, 0); pthread_cond_init(&cond_, 0);}
+    ~Lock() {pthread_mutex_destroy(&lock_);pthread_cond_destroy(&cond_);}
     void lock() {pthread_mutex_lock(&lock_);}
     void unlock() {pthread_mutex_unlock(&lock_);}
+    void wait() {pthread_cond_wait(&cond_, &lock_);}
+    void signal() {pthread_cond_signal(&cond_);}
 };
 
 template <typename T>
 class Queue
 {
 protected:
-    int head, tail;
+    int head_, tail_;
     int capacity_;
     T *items;
 public:
-    Queue<T>(int capacity) : head(0),tail(0),capacity_(capacity)
+    Queue<T>(int capacity) : head_(0),tail_(0),capacity_(capacity)
     {
         items = new T[capacity];
     }
@@ -57,72 +60,86 @@ class LockQueue: public Queue<int>
 {
 private:
     Lock lock;
+    pthread_cond_t condition;
 public:
-    LockQueue(int capacity) : Queue<int>(capacity) {}
+    LockQueue(int capacity) : Queue<int>(capacity) {pthread_cond_init(&condition, 0);}
 
     void enqueue(int item)
     {
         lock.lock();
-        if((tail - head) == capacity_) // full
+        if((tail_ - head_) == capacity_) // full
         {
-            lock.unlock();
-            throw FullException();
+            cout << "Queue is full, waiting..." << endl;
+            lock.wait();
         }
-        else
+        if(tail_ == head_)
         {
-            items[tail] = item;
-            tail++;
-            lock.unlock();
+            lock.signal();
         }
+        items[tail_ % capacity_] = item;
+        tail_++;
+        cout << "Enqueueing " << item << endl;
+        lock.unlock();
     }
 
     int dequeue() 
     {
+        int x;
         lock.lock();
-        if(tail == head) // empty
+        if(tail_ == head_) // empty
         {
-            lock.unlock();
-            throw EmptyException();
+            cout << "Queue is empty, waiting..." << endl;
+            lock.wait();
         }
-        else
+        if( (tail_ - head_) == capacity_)
         {
-            int x = items[head % capacity_];
-            head++;
-            lock.unlock();
-            return x;
+            lock.signal();
         }
-        return NULL;
+        x = items[head_ % capacity_];
+        head_++;
+        cout << "Dequeueing " << x << endl;
+        lock.unlock();
+        return x;
     }
 };
 
+typedef struct param_
+{
+    Queue<int> *q;
+}params_t, *pParams_t;
+
+void *producer(void *param)
+{
+    Queue<int> *q = ((pParams_t)param)->q;
+    for(int i = 0; i < 200; i++)
+    {
+        q->enqueue(i);
+    }
+
+    return NULL;
+}
+
+void *consumer(void *param)
+{
+    Queue<int> *q = ((pParams_t)param)->q;
+    for(int i = 0; i < 200; i++)
+    {
+        q->dequeue();
+    }
+
+    return NULL;
+}
+
 int main()
 {
-    LockQueue queue(100);
+    params_t params;
+    params.q = new LockQueue(100);
 
-    int i = 0;
-    try
-    {
-        while(true)
-        {
-            queue.enqueue(i);
-            i++;
-        }
-    }
-    catch(exception& e)
-    {
-        cout << e.what() << endl;
-    }
+    pthread_t prodId, consId;
+    pthread_create(&prodId, 0, producer, &params);
+    pthread_create(&consId, 0, consumer, &params);
 
-    try
-    {
-        while(true)
-        {
-            cout << queue.dequeue() << endl;
-        }
-    }
-    catch(exception& e)
-    {
-        cout << e.what() << endl;
-    }
+    pthread_join(prodId, NULL);
+    pthread_join(consId, NULL);
     return 0;
 }
