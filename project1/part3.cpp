@@ -9,23 +9,6 @@ extern "C"
 
 using namespace std;
 
-class EmptyException : public exception
-{
-    virtual const char* what() const throw()
-    {
-        return "Queue is empty!";
-    }
-};
-
-class FullException : public exception
-{
-
-    virtual const char* what() const throw()
-    {
-        return "Queue is full!";
-    }
-};
-
 class Lock {
 private:
     pthread_mutex_t lock_;
@@ -133,13 +116,23 @@ void *consumer(void *param)
 int main()
 {
     params_t params;
-    params.q = new LockQueue(100);
-
     pthread_t prodId, consId;
+
+    params.q = new LockQueue(100);
     pthread_create(&prodId, 0, producer, &params);
     pthread_create(&consId, 0, consumer, &params);
-
     pthread_join(prodId, NULL);
     pthread_join(consId, NULL);
+    delete params.q;
+
+    /* not yet...
+    params.q = new LockFreeQueue(100);
+    pthread_create(&prodId, 0, producer, &params);
+    pthread_create(&consId, 0, consumer, &params);
+    pthread_join(prodId, NULL);
+    pthread_join(consId, NULL);
+    delete params.q;
+    */
+
     return 0;
 }
