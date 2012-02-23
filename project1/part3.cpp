@@ -5,9 +5,13 @@ extern "C"
 {
 #include <stdint.h>
 #include <pthread.h>
+#include <time.h>
 }
 
 using namespace std;
+
+static const int DEFAULT_NUM_ITEMS = 200000;
+static const int DEFAULT_QUEUE_SIZE = 100;
 
 class Lock {
 private:
@@ -43,16 +47,14 @@ class LockQueue: public Queue<int>
 {
 private:
     Lock lock;
-    pthread_cond_t condition;
 public:
-    LockQueue(int capacity) : Queue<int>(capacity) {pthread_cond_init(&condition, 0);}
+    LockQueue(int capacity) : Queue<int>(capacity) {}
 
     void enqueue(int item)
     {
         lock.lock();
         if((tail_ - head_) == capacity_) // full
         {
-            cout << "Queue is full, waiting..." << endl;
             lock.wait();
         }
         if(tail_ == head_)
@@ -61,7 +63,6 @@ public:
         }
         items[tail_ % capacity_] = item;
         tail_++;
-        cout << "Enqueueing " << item << endl;
         lock.unlock();
     }
 
@@ -71,7 +72,6 @@ public:
         lock.lock();
         if(tail_ == head_) // empty
         {
-            cout << "Queue is empty, waiting..." << endl;
             lock.wait();
         }
         if( (tail_ - head_) == capacity_)
@@ -80,59 +80,96 @@ public:
         }
         x = items[head_ % capacity_];
         head_++;
-        cout << "Dequeueing " << x << endl;
         lock.unlock();
         return x;
     }
 };
 
+class LockFreeQueue: public Queue<int>
+{
+public:
+    LockFreeQueue(int capacity) : Queue<int>(capacity) {}
+
+    void enqueue(int item)
+    {
+        while((tail_ - head_) == capacity_) usleep(1); // full
+        items[tail_ % capacity_] = item;
+        tail_++;
+    }
+
+    int dequeue() 
+    {
+        int x;
+        while(tail_ == head_) usleep(1); // empty
+        x = items[head_ % capacity_];
+        head_++;
+        return x;
+    }
+};
+
+
 typedef struct param_
 {
     Queue<int> *q;
-}params_t, *pParams_t;
+    int n;
+}params_t;
 
 void *producer(void *param)
 {
-    Queue<int> *q = ((pParams_t)param)->q;
-    for(int i = 0; i < 200; i++)
+    Queue<int> *q = ((params_t*)param)->q;
+    int n = ((params_t*)param)->n;
+    for(int i = 0; i < n; i++)
     {
         q->enqueue(i);
     }
+    cout << "   Producer: enqueued " << n << " items" << endl;
 
     return NULL;
 }
 
 void *consumer(void *param)
 {
-    Queue<int> *q = ((pParams_t)param)->q;
-    for(int i = 0; i < 200; i++)
+    Queue<int> *q = ((params_t*)param)->q;
+    int n = ((params_t*)param)->n;
+    for(int i = 0; i < n; i++)
     {
         q->dequeue();
     }
+    cout << "   Consumer: dequeued " << n << " items" << endl;
 
     return NULL;
 }
 
-int main()
+int main(int argc, char *argv[])
 {
     params_t params;
     pthread_t prodId, consId;
 
-    params.q = new LockQueue(100);
+    int n = DEFAULT_NUM_ITEMS, m = DEFAULT_QUEUE_SIZE;
+
+    params.n = n;
+
+    
+
+    params.q = new LockQueue(m);
+    cout << "Using Locking Queue: " << endl;
+    cout << "   Creating producer and consumer..." << endl;
     pthread_create(&prodId, 0, producer, &params);
     pthread_create(&consId, 0, consumer, &params);
     pthread_join(prodId, NULL);
     pthread_join(consId, NULL);
+    cout << "   Producer and Consumer stopped." << endl;
     delete params.q;
 
-    /* not yet...
-    params.q = new LockFreeQueue(100);
+    params.q = new LockFreeQueue(DEFAULT_QUEUE_SIZE);
+    cout << "Using Lock-free Queue: " << endl;
+    cout << "   Creating producer and consumer..." << endl;
     pthread_create(&prodId, 0, producer, &params);
     pthread_create(&consId, 0, consumer, &params);
     pthread_join(prodId, NULL);
     pthread_join(consId, NULL);
+    cout << "   Producer and Consumer stopped." << endl;
     delete params.q;
-    */
 
     return 0;
 }
