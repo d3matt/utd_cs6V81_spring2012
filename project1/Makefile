@@ -34,6 +34,11 @@ part2: part2.o
 	@ echo LD $@
 	$(HIDE) $(LD) $(LDFLAGS) -o $@ $^
 
+#part2a uses the gcc built-in __sync_add_and_fetch() instead of a mutex
+part2a: part2a.o
+	@ echo LD $@
+	$(HIDE) $(LD) $(LDFLAGS) -o $@ $^
+
 part3: part3.o
 	@ echo LD $@
 	$(HIDE) $(LD) $(LDFLAGS) -o $@ $^

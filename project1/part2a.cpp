@@ -17,7 +17,6 @@ using namespace std;
 void *worker_thread(void *threadnum);
 
 uint32_t counter = 0;
-pthread_mutex_t M;
 
 int main(int argc, char ** argv)
 {
@@ -25,13 +24,11 @@ int main(int argc, char ** argv)
     vector<pthread_t> v;
 
     if(argc != 2) {
-        cerr << "./part2 <num_threads>" << endl;
+        cerr << "./part2a <num_threads>" << endl;
         return -1;
     }
     num_threads = boost::lexical_cast<uint32_t>(argv[1]);
 
-    cout << "initializing mutex" << endl;
-    pthread_mutex_init(&M, NULL);
     cout << "Spawning " << num_threads << " threads." << endl;
 
     for (uint32_t i = 0; i < num_threads; i++)
@@ -51,7 +48,6 @@ int main(int argc, char ** argv)
         pthread_join(v[i], NULL);
 
     cout << "counter is: " << counter << endl;
-    pthread_mutex_destroy(&M);
 }
 
 
@@ -59,10 +55,9 @@ void *worker_thread(void *threadnum)
 {
     uint32_t *tnum = (uint32_t *) threadnum;
     printf("Start of thread %d\n", *tnum);
-    for(uint32_t i=0 ; i < 10000; i++) {
-        pthread_mutex_lock(&M);
-        counter++;
-        pthread_mutex_unlock(&M);
+    for(uint32_t i=0 ; i < 100000; i++) {
+        usleep(1);
+        __sync_add_and_fetch (&counter, 1);
     }
     printf("End of thread %d\n", *tnum);
     delete tnum;
