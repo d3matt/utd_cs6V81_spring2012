@@ -178,7 +178,11 @@ int main(int argc, char *argv[])
         }
         else
         {
-            cerr << "Incorrect Usage:" << endl << argv[0] << " [-n <number of items>] [-m <queue size>]" << endl;
+            cerr << "Incorrect Usage:" << endl << argv[0] << " [-n <number of items>] [-m <queue size>] [-t <type>]" << endl
+                 << "Where type is one of the following: lock, lockfree" << endl
+                 << "If no options are provided the defaults are:" << endl
+                 << "n=200000, m=100, type=BOTH" << endl;
+            return -1;
         }
     }
 
