@@ -1,3 +1,4 @@
+James Hall and Matthew Stoltenberg
 
 In order to compile:
 On a *nix machine, run 'make'
@@ -67,3 +68,7 @@ Part3:
 ------------------------------------------
 |    10^9      |  5m22.884s |  0m32.295s |
 ------------------------------------------
+
+
+Just for fun:
+We also implemented part2 using an atomic add operation which we called part2a.  Performance was an order of magnitude better.

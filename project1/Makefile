@@ -11,7 +11,7 @@ ifeq ($(HIDE),)
 HIDE:= @
 endif
 
-BINLIST=part1 part2 part3
+BINLIST=part1 part2 part2a part3
 
 COMMON_OBJECTS = 
 
