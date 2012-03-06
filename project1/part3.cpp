@@ -94,7 +94,7 @@ public:
 
     void enqueue(int item)
     {
-        while((tail_ - head_) == capacity_) usleep(1); // full
+        while((tail_ - head_) == capacity_) pthread_testcancel(); // full
         items[tail_ % capacity_] = item;
         tail_++;
     }
@@ -102,7 +102,7 @@ public:
     int dequeue() 
     {
         int x;
-        while(tail_ == head_) usleep(1); // empty
+        while(tail_ == head_) pthread_testcancel(); // empty
         x = items[head_ % capacity_];
         head_++;
         return x;
@@ -207,7 +207,7 @@ int main(int argc, char *argv[])
 
     if(type == BOTH || type == LOCKFREE)
     {
-        params.q = new LockFreeQueue(DEFAULT_QUEUE_SIZE);
+        params.q = new LockFreeQueue(m);
         cout << "Using Lock-free Queue: " << endl;
         cout << "   Creating producer and consumer..." << endl;
         pthread_create(&prodId, 0, producer, &params);
