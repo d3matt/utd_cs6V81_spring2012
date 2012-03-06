@@ -55,8 +55,7 @@ void *worker_thread(void *threadnum)
 {
     uint32_t *tnum = (uint32_t *) threadnum;
     printf("Start of thread %d\n", *tnum);
-    for(uint32_t i=0 ; i < 100000; i++) {
-        usleep(1);
+    for(uint32_t i=0; i < 10000; i++) {
         __sync_add_and_fetch (&counter, 1);
     }
     printf("End of thread %d\n", *tnum);

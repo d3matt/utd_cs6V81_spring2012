@@ -175,6 +175,11 @@ int main(int argc, char *argv[])
             {
                 type = LOCKFREE;
             }
+            else if(boost::iequals(string("both"),string(argv[i])))
+            {
+                type = BOTH;
+            }
+
         }
         else
         {
