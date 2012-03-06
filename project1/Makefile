@@ -11,6 +11,11 @@ ifeq ($(HIDE),)
 HIDE:= @
 endif
 
+#definable user
+ifeq ($(DISTUSER),)
+DISTUSER:=mstolten010200
+endif
+
 BINLIST=part1 part2 part2a part3
 
 COMMON_OBJECTS = 
@@ -48,12 +53,12 @@ clean:
 
 distclean: clean
 	rm -rf .depend
-	rm -rf mjs010200 mjs010200.zip
+	rm -rf $(DISTUSER) $(DISTUSER).zip
 	rm -rf pexpect-2.3
 	rm -rf .log
 
 dist:
-	rm -rf mjs010200 mjs010200.zip
-	mkdir -p mjs010200
-	cp *.cpp README Makefile mjs010200/
-	zip mjs010200.zip mjs010200/*
+	rm -rf $(DISTUSER) $(DISTUSER).zip
+	mkdir -p $(DISTUSER)
+	cp *.cpp README Makefile $(DISTUSER)/
+	zip $(DISTUSER).zip $(DISTUSER)/*
