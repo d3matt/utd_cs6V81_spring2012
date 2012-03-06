@@ -55,5 +55,5 @@ distclean: clean
 dist:
 	rm -rf mjs010200 mjs010200.zip
 	mkdir -p mjs010200
-	cp *.cpp *.h *.py README Makefile mjs010200/
+	cp *.cpp README Makefile mjs010200/
 	zip mjs010200.zip mjs010200/*
