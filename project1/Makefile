@@ -13,7 +13,7 @@ endif
 
 #definable user
 ifeq ($(DISTUSER),)
-DISTUSER:=mstolten010200
+DISTUSER:=mjs010200
 endif
 
 BINLIST=part1 part2 part2a part3
