@@ -1,0 +1,74 @@
+James Hall and Matthew Stoltenberg
+
+In order to compile:
+On a *nix machine, run 'make'
+(This should work on any *nix machine, but if it fails, use cs1.utdallas.edu)
+This will build all three parts of the assignment.
+
+To invoke:
+Part 1:
+./part1 <number of threads>
+
+Part 2:
+./part2 <number of threads>
+
+Part3:
+./part3 [-n <number of items to enqueue and dequeue>] [-m <queue size>] [-t <type>]
+Where <type> is one of the following: lock, lockfree
+If any of the above options are not provided, the defaults are as follows:
+number of items: 200000
+queue size:      100
+type:            BOTH
+
+
+Results:
+Part1:
+--------------------------------------
+|  threads  |  counter  |  time      |
+--------------------------------------
+|     1     |  10000    | 0m0.001s   |
+--------------------------------------
+|     4     |  40000    | 0m0.002s   |
+--------------------------------------
+|     8     |  80000    | 0m0.002s   |
+--------------------------------------
+|     16    |  160000   | 0m0.002s   |
+--------------------------------------
+
+Part2:
+--------------------------------------
+|  threads  |  counter  |  time      |
+--------------------------------------
+|     1     |  10000    | 0m0.002s   |
+--------------------------------------
+|     4     |  40000    | 0m0.005s   |
+--------------------------------------
+|     8     |  80000    | 0m0.008s   |
+--------------------------------------
+|     16    |  160000   | 0m0.015s   |
+--------------------------------------
+
+Part3:
+------------------------------------------
+| items queued |  Locking   |  Lockfree  |
+------------------------------------------
+|    10^2      |  0m0.002s  |  0m0.002s  |
+------------------------------------------
+|    10^3      |  0m0.002s  |  0m0.002s  |
+------------------------------------------
+|    10^4      |  0m0.004s  |  0m0.002s  |
+------------------------------------------
+|    10^5      |  0m0.034s  |  0m0.005s  |
+------------------------------------------
+|    10^6      |  0m0.330s  |  0m0.043s  |
+------------------------------------------
+|    10^7      |  0m3.545s  |  0m0.412s  |
+------------------------------------------
+|    10^8      |  0m34.340s |  0m3.645s  |
+------------------------------------------
+|    10^9      |  5m22.884s |  0m32.295s |
+------------------------------------------
+
+
+Just for fun:
+We also implemented part2 using an atomic add operation which we called part2a.  Performance was an order of magnitude better.

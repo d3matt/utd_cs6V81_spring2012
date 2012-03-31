@@ -1,5 +1,7 @@
 #include <iostream>
 #include <exception>
+#include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string.hpp>
 
 extern "C"
 {
@@ -92,7 +94,7 @@ public:
 
     void enqueue(int item)
     {
-        while((tail_ - head_) == capacity_) usleep(1); // full
+        while((tail_ - head_) == capacity_) pthread_testcancel(); // full
         items[tail_ % capacity_] = item;
         tail_++;
     }
@@ -100,7 +102,7 @@ public:
     int dequeue() 
     {
         int x;
-        while(tail_ == head_) usleep(1); // empty
+        while(tail_ == head_) pthread_testcancel(); // empty
         x = items[head_ % capacity_];
         head_++;
         return x;
@@ -142,34 +144,84 @@ void *consumer(void *param)
 
 int main(int argc, char *argv[])
 {
+    enum QueueType {BOTH, LOCKING, LOCKFREE};
+
     params_t params;
     pthread_t prodId, consId;
 
-    int n = DEFAULT_NUM_ITEMS, m = DEFAULT_QUEUE_SIZE;
+    uint32_t n = DEFAULT_NUM_ITEMS, m = DEFAULT_QUEUE_SIZE;
+    QueueType type = BOTH;
+
+    for(int i = 1; i < argc; i++)
+    {
+        if(string("-n") == argv[i])
+        {   
+            i++;
+            n = boost::lexical_cast<uint32_t>(argv[i]);
+        }
+        else if (string("-m") == argv[i])
+        {
+            i++;
+            m = boost::lexical_cast<uint32_t>(argv[i]);
+        }
+        else if(string("-t") == argv[i])
+        {
+            i++;
+            if(boost::iequals(string("lock"),string(argv[i])))
+            {
+                type = LOCKING;
+            }
+            else if(boost::iequals(string("lockfree"),string(argv[i])))
+            {
+                type = LOCKFREE;
+            }
+            else if(boost::iequals(string("both"),string(argv[i])))
+            {
+                type = BOTH;
+            }
+
+        }
+        else
+        {
+            cerr << "Incorrect Usage:" << endl << argv[0] << " [-n <number of items>] [-m <queue size>] [-t <type>]" << endl
+                 << "Where type is one of the following: lock, lockfree" << endl
+                 << "If no options are provided the defaults are:" << endl
+                 << "n=200000, m=100, type=BOTH" << endl;
+            return -1;
+        }
+    }
+
+    cout << "Starting execution using:" << endl
+         << "number of items to queue: " << n << endl
+         << "queue size:               " << m << endl;
 
     params.n = n;
 
-    
+    if(type == BOTH || type == LOCKING)
+    {
+        params.q = new LockQueue(m);
+        cout << "Using Locking Queue: " << endl;
+        cout << "   Creating producer and consumer..." << endl;
+        pthread_create(&prodId, 0, producer, &params);
+        pthread_create(&consId, 0, consumer, &params);
+        pthread_join(prodId, NULL);
+        pthread_join(consId, NULL);
+        cout << "   Producer and Consumer stopped." << endl;
+        delete params.q;
+    }
 
-    params.q = new LockQueue(m);
-    cout << "Using Locking Queue: " << endl;
-    cout << "   Creating producer and consumer..." << endl;
-    pthread_create(&prodId, 0, producer, &params);
-    pthread_create(&consId, 0, consumer, &params);
-    pthread_join(prodId, NULL);
-    pthread_join(consId, NULL);
-    cout << "   Producer and Consumer stopped." << endl;
-    delete params.q;
-
-    params.q = new LockFreeQueue(DEFAULT_QUEUE_SIZE);
-    cout << "Using Lock-free Queue: " << endl;
-    cout << "   Creating producer and consumer..." << endl;
-    pthread_create(&prodId, 0, producer, &params);
-    pthread_create(&consId, 0, consumer, &params);
-    pthread_join(prodId, NULL);
-    pthread_join(consId, NULL);
-    cout << "   Producer and Consumer stopped." << endl;
-    delete params.q;
+    if(type == BOTH || type == LOCKFREE)
+    {
+        params.q = new LockFreeQueue(m);
+        cout << "Using Lock-free Queue: " << endl;
+        cout << "   Creating producer and consumer..." << endl;
+        pthread_create(&prodId, 0, producer, &params);
+        pthread_create(&consId, 0, consumer, &params);
+        pthread_join(prodId, NULL);
+        pthread_join(consId, NULL);
+        cout << "   Producer and Consumer stopped." << endl;
+        delete params.q;
+    }
 
     return 0;
 }
