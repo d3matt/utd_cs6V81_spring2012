@@ -71,7 +71,7 @@ int main(int argc, char ** argv)
     }
 
     if(ARGV.size() != 1) {
-        cerr << "./part2 <num_threads> [TASLOCK] [TTASLOCK] [BACKOFF] [ALOCK]" << endl;
+        cerr << argv[0] << " <num_threads> [TASLOCK] [TTASLOCK] [BACKOFF] [ALOCK]" << endl;
         return -1;
     }
     num_threads = boost::lexical_cast<uint32_t>(ARGV[0]);
