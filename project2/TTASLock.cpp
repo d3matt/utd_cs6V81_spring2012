@@ -7,7 +7,7 @@
 
 #include "TTASLock.h"
 
-#define TTASLOCK_DEBUG
+//#define TTASLOCK_DEBUG
 #ifdef  TTASLOCK_DEBUG
 #define DBGDISP(format, args...) \
     printf("%s:%d " format "\n",__FILE__,__LINE__,  \
@@ -27,7 +27,7 @@ void TTASLock::lock()
 {
     while(1)
     {
-        while( AO_test_and_set(&state) == AO_TS_SET)
+        while( state == AO_TS_SET)
         {
             DBGDISP("yielding %lu", syscall(__NR_gettid) );
             pthread_yield();
