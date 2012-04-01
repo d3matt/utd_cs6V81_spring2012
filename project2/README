@@ -1,0 +1,9 @@
+Matthew Stoltenberg and James Hall
+
+In order to compile:
+On a linux machine, run 'make'
+
+Note: requires boost-devel, libatomic_ops (libatomic_ops-devel in fedora 16)
+
+To invoke:
+./simple_test <num_threads> [TASLOCK] [TTASLOCK] [BACKOFF] [ALOCK]
