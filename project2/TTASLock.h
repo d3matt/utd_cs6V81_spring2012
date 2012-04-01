@@ -1,9 +1,9 @@
-#ifndef __TASLOCK_H__
-#define __TASLOCK_H__
+#ifndef __TTASLOCK_H__
+#define __TTASLOCK_H__
 
 #include "common.h"
 
-class TASLock : public LOCK
+class TTASLock : public LOCK
 {
     //state has two possible values:
     //  AO_TS_SET
@@ -11,10 +11,10 @@ class TASLock : public LOCK
     volatile unsigned char state;
 
 public:
-    TASLock();
-    ~TASLock() {};
+    TTASLock();
+    ~TTASLock() {};
     void lock(void);
     void unlock(void);
 };
 
-#endif //__TASLOCK_H__
+#endif //__TTASLOCK_H__

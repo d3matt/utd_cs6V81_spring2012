@@ -1,3 +1,6 @@
+#ifndef __ALOCK_H__
+#define __ALOCK_H__
+
 #include <stdint.h>
 #include <pthread.h>
 
@@ -32,3 +35,5 @@ public:
 };
 
 void dataDestructor(void *data);
+
+#endif //__ALOCK_H__

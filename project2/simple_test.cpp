@@ -8,10 +8,11 @@
 #include <pthread.h>
 #include <errno.h>
 
-#include "ALock.h"
 #include "TASLock.h"
+#include "TTASLock.h"
+#include "ALock.h"
 
-//#define SIMPLE_DEBUG
+#define SIMPLE_DEBUG
 #ifdef  SIMPLE_DEBUG
 #define DBGDISP(format, args...) \
     printf("%s:%d " format "\n",__FILE__,__LINE__,  \
@@ -48,7 +49,7 @@ int main(int argc, char ** argv)
     num_threads = boost::lexical_cast<uint32_t>(argv[1]);
 
     cout << "initializing LOCK" << endl;
-    testLock = new TASLock();
+    testLock = new TTASLock();
     cout << "Spawning " << num_threads << " threads." << endl;
 
     for (uint32_t i = 0; i < num_threads; i++)

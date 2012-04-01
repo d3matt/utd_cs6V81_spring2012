@@ -1,19 +1,12 @@
 #include <cstdio>
 
 #include <atomic_ops.h>
+#include <atomic_ops.h>
 #include <pthread.h>
 
-#include "TASLock.h"
+#include <cstdio>
 
-//#define TASLOCK_DEBUG
-#ifdef  TASLOCK_DEBUG
-#define DBGDISP(format, args...) \
-    printf("%s:%d " format "\n",__FILE__,__LINE__,  \
-    ## args         \
-    );
-#else
-    #define DBGDISP(format, args...)
-#endif
+#include "TASLock.h"
 
 TASLock::TASLock()
 {

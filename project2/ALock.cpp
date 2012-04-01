@@ -1,7 +1,7 @@
-#include <cstdio>
-
 #include <atomic_ops.h>
 #include <pthread.h>
+
+#include <cstdio>
 
 #include "ALock.h"
 
