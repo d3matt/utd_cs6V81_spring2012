@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cstdio>
 #include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string.hpp>
 #include <vector>
 
 #include <malloc.h>
@@ -12,7 +13,7 @@
 #include "TTASLock.h"
 #include "ALock.h"
 
-#define SIMPLE_DEBUG
+//#define SIMPLE_DEBUG
 #ifdef  SIMPLE_DEBUG
 #define DBGDISP(format, args...) \
     printf("%s:%d " format "\n",__FILE__,__LINE__,  \
@@ -31,25 +32,60 @@ public:
     LOCK       *lock;
 };
 
+enum locktype_t
+{
+    TEST_TASLOCK,
+    TEST_TTASLOCK,
+    TEST_ALOCK
+};
+
 void *worker_thread(void *Arg);
 
 static uint64_t counter;
 
 int main(int argc, char ** argv)
 {
-    uint32_t num_threads;
-    vector<pthread_t> v;
+    uint32_t            num_threads;
+    vector<pthread_t>   v;
+    vector<string>      ARGV;
+    locktype_t          locktype = TEST_TASLOCK;
+    LOCK               *testLock;
 
-    LOCK * testLock;
+    for(int32_t i=1; i < argc; i++) {
+        string s = argv[i];
+        boost::algorithm::to_upper(s);
+        if ( s == "TASLOCK")
+            locktype = TEST_TASLOCK;
+        else if ( s == "TTASLOCK")
+            locktype = TEST_TTASLOCK;
+        else if ( s == "ALOCK")
+            locktype = TEST_ALOCK;
+        else
+            ARGV.push_back( string(argv[i]) );
+    }
 
-    if(argc != 2) {
-        cerr << "./part2 <num_threads>" << endl;
+    if(ARGV.size() != 1) {
+        cerr << "./part2 <num_threads> [TASLOCK] [TTASLOCK] [ALOCK]" << endl;
         return -1;
     }
-    num_threads = boost::lexical_cast<uint32_t>(argv[1]);
+    num_threads = boost::lexical_cast<uint32_t>(ARGV[0]);
 
-    cout << "initializing LOCK" << endl;
-    testLock = new TTASLock();
+    switch(locktype)
+    {
+    case TEST_TASLOCK:
+        cout << "initializing TASLock" << endl;
+        testLock = new TASLock();
+        break;
+    case TEST_TTASLOCK:
+        cout << "initializing TTASLock" << endl;
+        testLock = new TTASLock();
+        break;
+    case TEST_ALOCK:
+        cout << "initializing ALock" << endl;
+        testLock = new ALock(num_threads);
+        break;
+    }
+
     cout << "Spawning " << num_threads << " threads." << endl;
 
     for (uint32_t i = 0; i < num_threads; i++)
