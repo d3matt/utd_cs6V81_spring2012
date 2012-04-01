@@ -1,0 +1,6 @@
+.*.swp
+.swp
+.depend
+*.o
+*.exe
+simple_test
