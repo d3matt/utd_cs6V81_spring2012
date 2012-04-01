@@ -44,6 +44,7 @@ void ALock::lock(void)
     while( ! flag[slot]) {}
 
     //at this point, we have the lock so no need for the overhead of Thread Local Storage
+    DBGDISP("current_slot: %u", current_slot);
     current_slot = slot;
 }
 
