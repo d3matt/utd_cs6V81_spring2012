@@ -9,6 +9,7 @@
 #include <errno.h>
 
 #include "ALock.h"
+#include "TASLock.h"
 
 //#define SIMPLE_DEBUG
 #ifdef  SIMPLE_DEBUG
@@ -38,8 +39,7 @@ int main(int argc, char ** argv)
     uint32_t num_threads;
     vector<pthread_t> v;
 
-    ALock * test_ALock;
-
+    LOCK * testLock;
 
     if(argc != 2) {
         cerr << "./part2 <num_threads>" << endl;
@@ -47,8 +47,8 @@ int main(int argc, char ** argv)
     }
     num_threads = boost::lexical_cast<uint32_t>(argv[1]);
 
-    cout << "initializing ALock" << endl;
-    test_ALock = new ALock(num_threads);
+    cout << "initializing LOCK" << endl;
+    testLock = new TASLock();
     cout << "Spawning " << num_threads << " threads." << endl;
 
     for (uint32_t i = 0; i < num_threads; i++)
@@ -56,7 +56,7 @@ int main(int argc, char ** argv)
         pthread_t p;
         worker_thread_arg * arg = new worker_thread_arg();
         arg->tnum = i;
-        arg->lock = test_ALock;
+        arg->lock = testLock;
 
         printf("Creating thread %d\n", arg->tnum);
         if ( pthread_create(&p, NULL, worker_thread, arg) ) {
@@ -70,7 +70,7 @@ int main(int argc, char ** argv)
         pthread_join(v[i], NULL);
 
     cout << "counter is: " << counter << endl;
-    delete test_ALock;
+    delete testLock;
 }
 
 
@@ -83,6 +83,10 @@ void *worker_thread(void *Arg)
         arg->lock->lock();
         DBGDISP("thread %u back", arg->tnum);
         counter++;
+
+        //yield each time through loop to make things interesting...
+        pthread_yield();
+
         DBGDISP("thread %u unlock()", arg->tnum);
         arg->lock->unlock();
         DBGDISP("thread %u back", arg->tnum);

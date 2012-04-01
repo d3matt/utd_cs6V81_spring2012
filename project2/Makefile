@@ -18,7 +18,7 @@ endif
 
 BINLIST=simple_test
 
-COMMON_OBJECTS = ALock.o
+COMMON_OBJECTS = TASLock.o ALock.o
 
 default: $(BINLIST)
 
