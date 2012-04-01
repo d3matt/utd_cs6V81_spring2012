@@ -11,6 +11,7 @@
 
 #include "TASLock.h"
 #include "TTASLock.h"
+#include "BackoffLock.h"
 #include "ALock.h"
 
 //#define SIMPLE_DEBUG
@@ -36,6 +37,7 @@ enum locktype_t
 {
     TEST_TASLOCK,
     TEST_TTASLOCK,
+    TEST_BACKOFF,
     TEST_ALOCK
 };
 
@@ -46,6 +48,8 @@ static uint64_t counter;
 int main(int argc, char ** argv)
 {
     uint32_t            num_threads;
+    uint32_t            minDelay=1;
+    uint32_t            maxDelay=1024;
     vector<pthread_t>   v;
     vector<string>      ARGV;
     locktype_t          locktype = TEST_TASLOCK;
@@ -58,6 +62,8 @@ int main(int argc, char ** argv)
             locktype = TEST_TASLOCK;
         else if ( s == "TTASLOCK")
             locktype = TEST_TTASLOCK;
+        else if (s == "BACKOFF")
+            locktype = TEST_BACKOFF;
         else if ( s == "ALOCK")
             locktype = TEST_ALOCK;
         else
@@ -65,7 +71,7 @@ int main(int argc, char ** argv)
     }
 
     if(ARGV.size() != 1) {
-        cerr << "./part2 <num_threads> [TASLOCK] [TTASLOCK] [ALOCK]" << endl;
+        cerr << "./part2 <num_threads> [TASLOCK] [TTASLOCK] [BACKOFF] [ALOCK]" << endl;
         return -1;
     }
     num_threads = boost::lexical_cast<uint32_t>(ARGV[0]);
@@ -79,6 +85,10 @@ int main(int argc, char ** argv)
     case TEST_TTASLOCK:
         cout << "initializing TTASLock" << endl;
         testLock = new TTASLock();
+        break;
+    case TEST_BACKOFF:
+        cout << "initializing BackoffLock" << endl;
+        testLock = new BackoffLock(minDelay, maxDelay);
         break;
     case TEST_ALOCK:
         cout << "initializing ALock" << endl;
