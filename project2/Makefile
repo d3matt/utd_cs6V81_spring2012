@@ -46,5 +46,5 @@ distclean: clean
 dist:
 	rm -rf $(DISTUSER) $(DISTUSER).zip
 	mkdir -p $(DISTUSER)
-	cp *.cpp README Makefile $(DISTUSER)/
+	cp *.h *.cpp README Makefile $(DISTUSER)/
 	zip $(DISTUSER).zip $(DISTUSER)/*
