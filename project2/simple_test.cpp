@@ -10,7 +10,7 @@
 
 #include "ALock.h"
 
-#define SIMPLE_DEBUG
+//#define SIMPLE_DEBUG
 #ifdef  SIMPLE_DEBUG
 #define DBGDISP(format, args...) \
     printf("%s:%d " format "\n",__FILE__,__LINE__,  \
