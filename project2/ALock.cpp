@@ -16,12 +16,7 @@
 #endif
 
 
-
-
-
-ALock::ALock(uint32_t capacity) :
-tail(0),
-size(capacity)
+ALock::ALock(uint32_t capacity) : tail(0), size(capacity)
 {
     flag = new bool[capacity];
     flag[0] = true;
@@ -31,7 +26,6 @@ size(capacity)
         exit(1);
     }
 
-
     DBGDISP("capacity: %u", capacity);
 }
 
@@ -39,28 +33,24 @@ ALock::~ALock()
 {
     bool * tmp = flag;
 
-    //FIXME: this will probably still break :)
     flag = 0;
     delete tmp;
 
     pthread_key_delete(ALockKey);
-
 }
 
 void ALock::lock(void)
 {
-
     //went with atomic ops...
     uint32_t tmp = AO_int_fetch_and_add1(&tail);
     uint32_t slot = tmp % size;
     DBGDISP("lock() tmp: %u slot: %u size: %u", tmp, slot, size);
 
-
     while( ! flag[slot])
     {
+        //have to yield otherwise it locks up
         pthread_yield();
     }
-
 
     ALockLocal * ptr = (ALockLocal *)pthread_getspecific(ALockKey);
     DBGDISP("prthread_getspecific: %p", ptr);
@@ -83,12 +73,10 @@ void ALock::unlock(void)
     flag[ ( ptr->index + 1 ) % size ] = true;
 }
 
-
 void ALockLocal::clearKey(void)
 {
     pthread_setspecific(myLock->ALockKey, NULL);
 }
-
 
 void dataDestructor(void *data) {
     if(data) {
