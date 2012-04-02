@@ -1,6 +1,12 @@
 #ifndef __BACKOFFLOCK_H__
 #define __BACKOFFLOCK_H__
 
+/* PROBLEM:
+ * following errors on cs1.utdallas.edu
+BackoffLock.h:7:53: warning: boost/random/uniform_int_distribution.hpp: No such file or directory
+BackoffLock.h:16: error: âmt19937â in namespace âboost::randomâ does not name a type
+*/
+
 #include <stdint.h>
 
 #include <boost/random/mersenne_twister.hpp>
