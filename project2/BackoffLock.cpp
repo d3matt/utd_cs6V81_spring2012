@@ -1,6 +1,7 @@
 #include <atomic_ops.h>
 #include <stdint.h>
 #include <unistd.h>
+#include <fstream>
 
 #include <algorithm>
 #include <ctime>
@@ -12,7 +13,10 @@ using namespace std;
 Backoff::Backoff(uint32_t minDelay, uint32_t maxDelay)
     : minDelay(minDelay), maxDelay(maxDelay), limit(maxDelay)
 {
-    gen.seed( std::time(0) );
+    ifstream randseed("/dev/urandom", ios::binary);
+    uint32_t seed;
+    randseed.read((char*)&seed, 4);
+    gen.seed( seed );
 }
 
 void Backoff::backoff(void)
@@ -21,7 +25,7 @@ void Backoff::backoff(void)
     uint32_t delay = dist(gen);
 
     limit = min(maxDelay, 2 * limit);
-    usleep(delay * 1000);
+    usleep(delay);
 }
 
 
@@ -31,7 +35,7 @@ void BackoffLock::lock(void)
     Backoff backoff(minDelay, maxDelay);
     while(1)
     {
-        while( state == AO_TS_SET)
+        do
         {
             if( AO_test_and_set(&state) != AO_TS_SET) {
                 return;
@@ -39,7 +43,7 @@ void BackoffLock::lock(void)
             else {
                 backoff.backoff();
             }
-        }
+        } while( state == AO_TS_SET);
     }
 }
 

@@ -15,7 +15,7 @@
 #include "ALock.h"
 
 //#define SIMPLE_DEBUG
-#ifdef  SIMPLE_DEBUG
+#ifdef  PROJ_DEBUG
 #define DBGDISP(format, args...) \
     printf("%s:%d " format "\n",__FILE__,__LINE__,  \
     ## args         \
@@ -49,7 +49,7 @@ int main(int argc, char ** argv)
 {
     uint32_t            num_threads=10;
     uint32_t            minDelay=1;
-    uint32_t            maxDelay=1024;
+    uint32_t            maxDelay=128;
     vector<pthread_t>   v;
     vector<string>      ARGV;
     locktype_t          locktype = TEST_TASLOCK;
