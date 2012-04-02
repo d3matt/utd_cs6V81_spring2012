@@ -47,7 +47,7 @@ static uint64_t counter;
 
 int main(int argc, char ** argv)
 {
-    uint32_t            num_threads;
+    uint32_t            num_threads=10;
     uint32_t            minDelay=1;
     uint32_t            maxDelay=1024;
     vector<pthread_t>   v;
@@ -67,14 +67,18 @@ int main(int argc, char ** argv)
         else if ( s == "ALOCK")
             locktype = TEST_ALOCK;
         else
-            ARGV.push_back( string(argv[i]) );
+        {
+            try
+            {
+                num_threads = boost::lexical_cast<uint32_t>(argv[i]);
+            }
+            catch (...)
+            {
+                cerr << argv[0] << " [num_threads] [TASLOCK|TTASLOCK|BACKOFF|ALOCK]" << endl;
+                return -1;
+            }
+        }
     }
-
-    if(ARGV.size() != 1) {
-        cerr << argv[0] << " <num_threads> [TASLOCK] [TTASLOCK] [BACKOFF] [ALOCK]" << endl;
-        return -1;
-    }
-    num_threads = boost::lexical_cast<uint32_t>(ARGV[0]);
 
     switch(locktype)
     {
