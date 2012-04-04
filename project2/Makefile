@@ -39,6 +39,10 @@ second_test: second_test.o $(COMMON_OBJECTS)
 	@ echo LD $@
 	$(HIDE) $(LD) $(LDFLAGS) -o $@ $^
 
+pdf: 
+	@echo PDF $(DISTUSER)
+	$(HIDE) $(MAKE) HIDE=$(HIDE) -C tex/
+
 clean:
 	rm -f *.map *.o $(BINLIST) core.* *.exe.stackdump *.pyc
 
@@ -47,8 +51,9 @@ distclean: clean
 	rm -rf $(DISTUSER) $(DISTUSER).zip
 	rm -rf .log
 
-dist:
+dist: pdf
 	rm -rf $(DISTUSER) $(DISTUSER).zip
 	mkdir -p $(DISTUSER)
+	if [ -f tex/paper.pdf ] ; then  mv -f tex/paper.pdf $(DISTUSER)/ ; fi
 	cp *.h *.cpp README Makefile $(DISTUSER)/
 	zip $(DISTUSER).zip $(DISTUSER)/*

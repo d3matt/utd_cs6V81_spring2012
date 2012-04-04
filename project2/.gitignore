@@ -3,5 +3,8 @@
 .depend
 *.o
 *.exe
+*.aux
 simple_test
 second_test
+paper.log
+pdflatex.log
