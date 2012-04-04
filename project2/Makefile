@@ -4,7 +4,7 @@ LD=$(CXX)
 CFLAGS=-Wall -g -fexceptions -O2
 #uncomment to enable extra debug messages
 #CFLAGS+=-DPROJ_DEBUG
-LDFLAGS=-lpthread
+LDFLAGS=-lpthread -lrt
 
 #pretty printing of CXX and LD
 ifeq ($(HIDE),)
@@ -16,9 +16,9 @@ ifeq ($(DISTUSER),)
 DISTUSER:=mjs010200
 endif
 
-BINLIST=simple_test
+BINLIST=simple_test second_test
 
-COMMON_OBJECTS = TASLock.o TTASLock.o BackoffLock.o ALock.o
+COMMON_OBJECTS = TASLock.o TTASLock.o BackoffLock.o ALock.o test_common.o
 
 default: $(BINLIST)
 
@@ -32,6 +32,10 @@ default: $(BINLIST)
 -include .depend/*.d
 
 simple_test: simple_test.o $(COMMON_OBJECTS)
+	@ echo LD $@
+	$(HIDE) $(LD) $(LDFLAGS) -o $@ $^
+
+second_test: second_test.o $(COMMON_OBJECTS)
 	@ echo LD $@
 	$(HIDE) $(LD) $(LDFLAGS) -o $@ $^
 
