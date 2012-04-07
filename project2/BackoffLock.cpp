@@ -21,7 +21,7 @@ Backoff::Backoff(uint32_t minDelay, uint32_t maxDelay)
 
 void Backoff::backoff(void)
 {
-    boost::random::uniform_int_distribution<> dist(1, limit);
+    distribution_type dist(1, limit);
     uint32_t delay = dist(gen);
 
     limit = min(maxDelay, 2 * limit);
