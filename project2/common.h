@@ -2,6 +2,7 @@
 #define __COMMON_H__
 
 #include <stdint.h>
+#include <time.h>
 
 //our "interface"
 class LOCK
@@ -29,6 +30,9 @@ public:
     uint32_t    maxDelay;
     uint32_t    num_threads;
     uint32_t    num_seconds;
+
+    //for second test
+    timespec    start;
 
     common_args();
 };
