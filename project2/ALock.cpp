@@ -20,12 +20,9 @@
 ALock::ALock(uint32_t capacity) : tail(0), size(capacity)
 {
     flag = new bool[capacity];
+    for( uint32_t i = 0 ; i < capacity; i++)
+        flag[i] = false;
     flag[0] = true;
-    int rc = pthread_key_create(&ALockKey, dataDestructor);
-    if(rc) {
-        printf("Error creating key\n");
-        _exit(1);
-    }
 
     DBGDISP("capacity: %u", capacity);
 }
@@ -37,7 +34,6 @@ ALock::~ALock()
     flag = 0;
     delete tmp;
 
-    pthread_key_delete(ALockKey);
 }
 
 void ALock::lock(void)
@@ -53,41 +49,14 @@ void ALock::lock(void)
         pthread_yield();
     }
 
-/*
-The pthread_getspecific() function shall return the thread-specific data value associated with the given key. If no thread-specific data value is associated with key, then the value NULL shall be returned.
+    // At this point we are in the CS. We don't need thread local storage...
 
-If successful, the pthread_setspecific() function shall return zero; otherwise, an error number shall be returned to indicate the error.
- */
-    ALockLocal * ptr = (ALockLocal *)pthread_getspecific(ALockKey);
-    DBGDISP("prthread_getspecific: %p", ptr);
-    if( ptr == NULL)
-    {
-        ptr = new ALockLocal();
-        ptr->myLock = this;
-        pthread_setspecific(ALockKey, ptr);
-    }
-    ptr->index = slot;
-    DBGDISP("ptr->index: %u", ptr->index);
+    curslot = slot;
 }
 
 void ALock::unlock(void)
 {
-    ALockLocal * ptr = (ALockLocal *) pthread_getspecific(ALockKey);
-
-    DBGDISP("unlock() index: %u", ptr->index);
-    flag[ptr->index] = false;
-    flag[ ( ptr->index + 1 ) % size ] = true;
+    flag[curslot] = false;
+    flag[ ( curslot + 1 ) % size ] = true;
 }
 
-void ALockLocal::clearKey(void)
-{
-    pthread_setspecific(myLock->ALockKey, NULL);
-}
-
-void dataDestructor(void *data) {
-    if(data) {
-        ALockLocal * ptr = (ALockLocal *)data;
-        ptr->clearKey();
-        delete ptr;
-    }
-}
