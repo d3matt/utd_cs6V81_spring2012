@@ -1,5 +1,6 @@
 #include <atomic_ops.h>
 #include <pthread.h>
+#include <unistd.h>
 
 #include <cstdio>
 
@@ -23,7 +24,7 @@ ALock::ALock(uint32_t capacity) : tail(0), size(capacity)
     int rc = pthread_key_create(&ALockKey, dataDestructor);
     if(rc) {
         printf("Error creating key\n");
-        exit(1);
+        _exit(1);
     }
 
     DBGDISP("capacity: %u", capacity);

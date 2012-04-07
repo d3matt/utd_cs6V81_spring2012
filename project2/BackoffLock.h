@@ -7,10 +7,8 @@
 
 #if BOOST_VERSION == 103301
 
-#include <boost/random/linear_congruential.hpp>
 #include <boost/random/uniform_int.hpp>
-#include <boost/random/uniform_real.hpp>
-#include <boost/random/variate_generator.hpp>
+#include <boost/random/mersenne_twister.hpp>
 
 typedef boost::uniform_int<> distribution_type;
 typedef boost::mt19937 mt_gen;
