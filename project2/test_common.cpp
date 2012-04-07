@@ -90,6 +90,7 @@ int test_common(common_args *carg, void *worker_thread(void *) )
         worker_thread_arg * arg = new worker_thread_arg();
         arg->tnum = i;
         arg->lock = testLock;
+        arg->carg = carg;
 
         printf("Creating thread %d\n", arg->tnum);
         if ( pthread_create(&p, NULL, worker_thread, arg) ) {
