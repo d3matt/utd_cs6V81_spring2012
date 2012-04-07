@@ -17,6 +17,12 @@ def main():
     types = ['ALOCK', 'TASLOCK', 'TTASLOCK', 'BACKOFF']
     threadcounts = [2, 4, 8, 16, 32]
 
+    
+    print 'cpus : %s' % open('/proc/cpuinfo').read().count('processor\t:')
+    print 'system : %s' % commands.getstatusoutput('uname -isv')[1]
+    print ''
+
+
     for type in types:
         for threads in threadcounts:
             cmd = './second_test %s %s' % (type, threads)

@@ -39,6 +39,7 @@ static uint64_t *tcounters;
 static void *worker_thread(void *Arg)
 {
     worker_thread_arg * arg = (worker_thread_arg *) Arg;
+    uint32_t tnum = arg->tnum;
     
     //not sure if each thread should run for 10 seconds or overall we should run for 10 seconds...
     timespec stop;
@@ -53,25 +54,25 @@ static void *worker_thread(void *Arg)
         pthread_yield();
         clock_gettime( CLOCK_REALTIME, &current );
     }
-    DBGDISP("start thread %2d : %ld.%ld", arg->tnum, current.tv_sec, current.tv_nsec);
+    DBGDISP("start thread %2d : %ld.%ld", tnum, current.tv_sec, current.tv_nsec);
 
     while( ts_lt(&current, &stop) ) {
-        DBGDISP("thread %u lock()", arg->tnum);
+        DBGDISP("thread %u lock()", tnum);
         arg->lock->lock();
-        DBGDISP("thread %u back", arg->tnum);
+        DBGDISP("thread %u back", tnum);
         counter++;
-        tcounters[arg->tnum]++;
+        tcounters[tnum]++;
 
         //yield each time through loop to make things interesting...
-        pthread_yield();
+        //pthread_yield();
 
-        DBGDISP("thread %u unlock()", arg->tnum);
+        DBGDISP("thread %u unlock()", tnum);
         arg->lock->unlock();
-        DBGDISP("thread %u back", arg->tnum);
+        DBGDISP("thread %u back", tnum);
 
         clock_gettime( CLOCK_REALTIME, &current );
     }
-    DBGDISP(" stop thread %2d : %ld.%ld %ld\n", arg->tnum, current.tv_sec, current.tv_nsec, tcounters[arg->tnum] );
+    DBGDISP(" stop thread %2d : %ld.%ld %ld\n", tnum, current.tv_sec, current.tv_nsec, tcounters[tnum] );
     delete arg;
     return NULL;
 }
