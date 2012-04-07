@@ -52,6 +52,11 @@ void ALock::lock(void)
         pthread_yield();
     }
 
+/*
+The pthread_getspecific() function shall return the thread-specific data value associated with the given key. If no thread-specific data value is associated with key, then the value NULL shall be returned.
+
+If successful, the pthread_setspecific() function shall return zero; otherwise, an error number shall be returned to indicate the error.
+ */
     ALockLocal * ptr = (ALockLocal *)pthread_getspecific(ALockKey);
     DBGDISP("prthread_getspecific: %p", ptr);
     if( ptr == NULL)
