@@ -22,7 +22,7 @@ common_args::common_args() :
     minDelay(1),
     maxDelay(128),
     num_threads(10),
-    num_seconds(10)
+    num_seconds(1)
     {
     }
 

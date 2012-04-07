@@ -39,6 +39,11 @@ second_test: second_test.o $(COMMON_OBJECTS)
 	@ echo LD $@
 	$(HIDE) $(LD) $(LDFLAGS) -o $@ $^
 
+tests test: second_test
+	./test.py
+
+.PHONY: tests test
+
 pdf: 
 	@echo PDF $(DISTUSER)
 	$(HIDE) $(MAKE) HIDE=$(HIDE) -C tex/
