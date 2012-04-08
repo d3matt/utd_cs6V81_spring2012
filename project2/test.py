@@ -18,20 +18,19 @@ def main():
     types = ['ALOCK', 'TASLOCK', 'TTASLOCK', 'BACKOFF']
     threadcounts = [2, 4, 8, 16, 32]
 
-    latex = ''
+    log = ''
+    print "Running..."
     
     os = commands.getstatusoutput('uname -si')[1]
     cpus = open('/proc/cpuinfo').read().count('processor\t:')
-    print 'machine : %s, %s CPUs' % (os, cpus)
-    print ''
 
-    latex += '\\subsection{%s, %s CPUs}\n\n' % (replace(os, '_', '\_'), cpus)
-    latex += 'Results for running on %s with %s processors\n\n' % (replace(os, '_', '\_'), cpus)
+    log += 'machine : %s, %s CPUs\n' % (os, cpus)
+    log += 'types : %s\n' % (len(types))
+    log += 'threadcounts : %s\n' % (len(threadcounts))
+    log += '\n'
 
     for type in types:
-        latex += 'The following is the results for the %s lock.\n\n' % type
-        latex += '\\begin{tabular}{|r||c|c|c|}\n'
-        latex += ' \\hline Number of Threads & Number of Runs & Mean & Standard Deviation \\\\ \n'
+
         for threads in threadcounts:
             cmd = './second_test %s %s' % (type, threads)
 
@@ -39,6 +38,7 @@ def main():
             n = 10
             for i in range(0,n):
                 counts.append( get_count(cmd) )
+                print ".",
 
             #loop was always true...
             dev  = numpy.std(counts)
@@ -51,19 +51,17 @@ def main():
                 mean = numpy.mean(counts)
                 n = ( (1.96 * dev ) / mean )
 
-            print 'type : %s' % type
-            print 'threads : %s' % threads
-            print 'n : %s' % len(counts)
-            print 'mean : %s' % numpy.mean(counts)
-            print 'stddev : %s' % numpy.std(counts)
-            print 'counts : %s' % counts
-            print ''
-            latex += ' \\hline %s & %s & %s & %s \\\\ \n' % (threads, n, numpy.mean(counts), numpy.std(counts))
+            log += 'type : %s\n' % type
+            log += 'threads : %s\n' % threads
+            log += 'n : %s\n' % len(counts)
+            log += 'mean : %s\n' % numpy.mean(counts)
+            log += 'stddev : %s\n' % numpy.std(counts)
+            log += 'counts : %s\n' % counts
 
-        latex += '\\hline\n'
-        latex += '\\end{tabular}\n\n\\vspace{12pt}'
+            print
 
-    open('tex/analysis_sub.in.test', 'w+').write(latex)
+    open('tex/test_results.log', 'w+').write(log)
+    print 'Done'
 
 if __name__ == "__main__":
     main()
