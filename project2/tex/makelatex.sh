@@ -1,6 +1,6 @@
 #!/bin/sh
 
-rm analysis.tex
+rm analysis.tex &> /dev/null
 
 cat analysis_header.in > analysis.tex
 
