@@ -3,6 +3,7 @@
 import commands
 import numpy
 import sys
+from string import replace
 
 def get_count(cmd):
     #print cmd
@@ -17,13 +18,20 @@ def main():
     types = ['ALOCK', 'TASLOCK', 'TTASLOCK', 'BACKOFF']
     threadcounts = [2, 4, 8, 16, 32]
 
+    latex = ''
     
-    print 'cpus : %s' % open('/proc/cpuinfo').read().count('processor\t:')
-    print 'system : %s' % commands.getstatusoutput('uname -isv')[1]
+    os = commands.getstatusoutput('uname -si')[1]
+    cpus = open('/proc/cpuinfo').read().count('processor\t:')
+    print 'machine : %s, %s CPUs' % (os, cpus)
     print ''
 
+    latex += '\\subsection{%s, %s CPUs}\n\n' % (replace(os, '_', '\_'), cpus)
+    latex += 'Results for running on %s with %s processors\n\n' % (replace(os, '_', '\_'), cpus)
 
     for type in types:
+        latex += 'The following is the results for the %s lock.\n\n' % type
+        latex += '\\begin{tabular}{|r||c|c|c|}\n'
+        latex += ' \\hline Number of Threads & Number of Runs & Mean & Standard Deviation \\\\ \n'
         for threads in threadcounts:
             cmd = './second_test %s %s' % (type, threads)
 
@@ -50,6 +58,12 @@ def main():
             print 'stddev : %s' % numpy.std(counts)
             print 'counts : %s' % counts
             print ''
+            latex += ' \\hline %s & %s & %s & %s \\\\ \n' % (threads, n, numpy.mean(counts), numpy.std(counts))
+
+        latex += '\\hline\n'
+        latex += '\\end{tabular}\n\n\\vspace{12pt}'
+
+    open('tex/analysis_sub.in.test', 'w+').write(latex)
 
 if __name__ == "__main__":
     main()
