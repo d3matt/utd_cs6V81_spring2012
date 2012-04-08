@@ -40,6 +40,10 @@ def main():
             for i in range(0,n):
                 counts.append( get_count(cmd) )
 
+            #loop was always true...
+            dev  = numpy.std(counts)
+            mean = numpy.mean(counts)
+            n = ( (1.96 * dev ) / mean )
             while ( n > len(counts) ) :
                 counts.append( get_count(cmd) )
 
