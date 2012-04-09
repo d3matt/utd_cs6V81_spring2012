@@ -3,8 +3,14 @@
 import sys
 import string
 
+filename = 'test_results'
 try:
-    results = open('test_results.log', 'r').read().splitlines()
+    filename = sys.argv[1]
+except:
+    pass
+
+try:
+    results = open(filename, 'r').read().splitlines()
 except():
     sys.exit(0)
 latex = ''
@@ -17,8 +23,13 @@ threadcounts = int(results[2].split(':')[1].strip())
 
 results = results[4:]
 
-latex += '\\subsection{%s}\n\n' % (string.replace(machine, '_', '\_'))
-latex += 'Results for running on %s\n\n' % (string.replace(machine, '_', '\_'))
+latex += '\\subsubsection{%s}\n\n' % (string.replace(machine, '_', '\_'))
+latex += 'Results in tables '
+for i in range(0,types):
+    latex += '\\ref{table_%s_%s}' % (filename, i)
+    if i != types-1:
+        latex += ', '
+latex += '\n\n'
 
 for i in range(0,types):
     type = results[0].split(':')[1].strip()
@@ -38,7 +49,10 @@ for i in range(0,types):
     latex += '  \\hline\n'
     latex += ' \\end{tabular}\n'
     latex += ' \\end{center}\n'
-    latex += '\\end{table}\n'
+    latex += ' \\label{table_%s_%s}\n' % (filename, i)
+    latex += '\\end{table}\n\n'
 
-open('analysis_sub.in.test', 'w+').write(latex)
+latex += '\\clearpage\n\n'
+
+open('analysis_sub1.in.%s' % filename, 'w+').write(latex)
 

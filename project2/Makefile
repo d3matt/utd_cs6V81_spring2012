@@ -44,8 +44,9 @@ tests test: second_test
 
 .PHONY: tests test
 
-pdf: 
+pdf: test_results
 	@echo PDF $(DISTUSER)
+	$(HIDE) cp test_results tex/
 	$(HIDE) $(MAKE) HIDE=$(HIDE) -C tex/
 
 clean:

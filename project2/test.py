@@ -16,7 +16,7 @@ def get_count(cmd):
 def main():
 
     types = ['ALOCK', 'TASLOCK', 'TTASLOCK', 'BACKOFF']
-    threadcounts = [2, 4, 8, 16, 32]
+    threadcounts = [1, 2, 10, 32, 64, 75, 100]
 
     log = ''
     print "Running..."
@@ -60,7 +60,7 @@ def main():
 
             print
 
-    open('tex/test_results.log', 'w+').write(log)
+    open('test_results', 'w+').write(log)
     print 'Done'
 
 if __name__ == "__main__":

@@ -1,0 +1,9 @@
+
+\subsection{Throughput vs Threads}
+The results below were generated using a global counter.  Each thread behaved as below:
+\begin{verbatim}
+lock();
+counter++;
+unlock();
+\end{verbatim}
+
