@@ -26,32 +26,47 @@ common_args::common_args() :
     {
     }
 
+#define u32_cast(str) boost::lexical_cast<uint32_t>(str)
+
 void parse_args(int argc, char **argv, common_args *carg)
 {
-
-    for(int32_t i=1; i < argc; i++) {
-        string s = argv[i];
-        boost::algorithm::to_upper(s);
-        if ( s == "TASLOCK")
-            carg->locktype = TEST_TASLOCK;
-        else if ( s == "TTASLOCK")
-            carg->locktype = TEST_TTASLOCK;
-        else if (s == "BACKOFF")
-            carg->locktype = TEST_BACKOFF;
-        else if ( s == "ALOCK")
-            carg->locktype = TEST_ALOCK;
-        else
-        {
-            try
-            {
-                carg->num_threads = boost::lexical_cast<uint32_t>(argv[i]);
-            }
-            catch (...)
-            {
-                cerr << argv[0] << " [num_threads] [TASLOCK|TTASLOCK|BACKOFF|ALOCK]" << endl;
-                exit(-1);
-            }
+    try {
+        for(int32_t i=1; i < argc; i++) {
+            string s = argv[i];
+            boost::algorithm::to_upper(s);
+            if ( s == "TASLOCK" )
+                carg->locktype = TEST_TASLOCK;
+            else if ( s == "TTASLOCK" )
+                carg->locktype = TEST_TTASLOCK;
+            else if ( s == "BACKOFF" )
+                carg->locktype = TEST_BACKOFF;
+            else if ( s == "ALOCK" )
+                carg->locktype = TEST_ALOCK;
+            else if ( s.compare(0, 9, "MINDELAY=") == 0) 
+                carg->minDelay = u32_cast( s.substr(9, string::npos) );
+            else if ( s.compare(0, 9, "MAXDELAY=") == 0)
+                carg->maxDelay = u32_cast( s.substr(9, string::npos) );
+            else if ( s.compare(0, 8, "SECONDS=") == 0)
+                carg->num_seconds = u32_cast( s.substr(8, string::npos) );
+            else 
+                carg->num_threads = u32_cast(argv[i]);
         }
+    }
+    catch (...) {
+        cerr << argv[0] << " [num_threads] [<locktype>] [<other options>]" << endl;
+        cerr << endl;
+        cerr << "    locktype is one of:" << endl;
+        cerr << "        TASLOCK  - Test And Set Lock" << endl;
+        cerr << "        TTASLOCK - Test Test And Set Lock" << endl;
+        cerr << "        BACKOFF  - exponential Backoff Lock" << endl;
+        cerr << "        ALOCK    - Anderson Lock (array based)" << endl;
+        cerr << endl;
+        cerr << "    other options (in the form of OPTION=VALUE)" << endl;
+        cerr << "        MINDELAY - set min delay for Backoff Lock        (uint32_t)" << endl;
+        cerr << "        MAXDELAY - set max delay for Backoff Lock        (uint32_t)" << endl;
+        cerr << "        SECONDS  - set number of seconds for second_test (uint32_t)" << endl;
+        cerr << endl;
+        exit(-1);
     }
 }
 
@@ -66,7 +81,7 @@ LOCK * create_lock(common_args *carg)
         cout << "initializing TTASLock" << endl;
         return new TTASLock();
     case TEST_BACKOFF:
-        cout << "initializing BackoffLock" << endl;
+        cout << "initializing BackoffLock (" << carg->minDelay << ", " << carg->maxDelay << ")" << endl;
         return new BackoffLock(carg->minDelay, carg->maxDelay);
     case TEST_ALOCK:
         cout << "initializing ALock" << endl;
