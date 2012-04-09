@@ -62,9 +62,9 @@ void parse_args(int argc, char **argv, common_args *carg)
         cerr << "        ALOCK    - Anderson Lock (array based)" << endl;
         cerr << endl;
         cerr << "    other options (in the form of OPTION=VALUE)" << endl;
-        cerr << "        MINDELAY - set min delay for Backoff Lock        (uint32_t)" << endl;
-        cerr << "        MAXDELAY - set max delay for Backoff Lock        (uint32_t)" << endl;
-        cerr << "        SECONDS  - set number of seconds for second_test (uint32_t)" << endl;
+        cerr << "        MINDELAY=<min> - set min delay for Backoff Lock        (uint32_t)" << endl;
+        cerr << "        MAXDELAY=<max> - set max delay for Backoff Lock        (uint32_t)" << endl;
+        cerr << "        SECONDS=<sec>  - set number of seconds for second_test (uint32_t)" << endl;
         cerr << endl;
         exit(-1);
     }
