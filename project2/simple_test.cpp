@@ -35,7 +35,7 @@ static void *worker_thread(void *Arg)
         counter++;
 
         //yield each time through loop to make things interesting...
-        pthread_yield();
+        //pthread_yield();
 
         DBGDISP("thread %u unlock()", arg->tnum);
         arg->lock->unlock();

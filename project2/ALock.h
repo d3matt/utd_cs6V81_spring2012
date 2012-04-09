@@ -9,8 +9,8 @@
 class ALock : public LOCK
 {
     bool           *flag;
-    uint32_t        tail;
-    uint32_t        size;
+    uint64_t        tail;
+    uint64_t        size;
     uint32_t        curslot;
 
 public:
