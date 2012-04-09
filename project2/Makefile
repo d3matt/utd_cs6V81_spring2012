@@ -19,6 +19,7 @@ endif
 BINLIST=simple_test second_test
 
 COMMON_OBJECTS = TASLock.o TTASLock.o BackoffLock.o ALock.o test_common.o
+COMMON_OBJECTS_PROF = $(addsuffix .prof, $(COMMON_OBJECTS))
 
 default: $(BINLIST)
 
@@ -27,6 +28,11 @@ default: $(BINLIST)
 	@ mkdir -p .depend
 	@ echo CXX $@
 	$(HIDE) $(CXX) $(CFLAGS) -c -o $@ -MMD -MF $(@:%.o=.depend/%.d) $(firstword $^)
+
+%.o.prof: %.cpp
+	@ mkdir -p .depend
+	@ echo CXX $@
+	$(HIDE) $(CXX) $(CFLAGS) -c -o $@ -MMD -MF $(@:%.o.prof=.depend/$.d) $(firstword $^)
 
 #include generated dependency files
 -include .depend/*.d
@@ -39,10 +45,20 @@ second_test: second_test.o $(COMMON_OBJECTS)
 	@ echo LD $@
 	$(HIDE) $(LD) $(LDFLAGS) -o $@ $^
 
+simple_test.prof: simple_test.o.prof $(COMMON_OBJECTS_PROF)
+	@ echo LD $@
+	$(HIDE) $(LD) $(LDFLAGS) -pg -o $@ $^
+
+second_test.prof: second_test.o.prof $(COMMON_OBJECTS_PROF)
+	@ echo LD $@
+	$(HIDE) $(LD) $(LDFLAGS) -pg -o $@ $^
+
+prof : simple_test.prof second_test.prof
+
 tests test: second_test
 	./test.py
 
-.PHONY: tests test
+.PHONY: prof tests test
 
 pdf: test_results
 	@echo PDF $(DISTUSER)
@@ -50,7 +66,7 @@ pdf: test_results
 	$(HIDE) $(MAKE) HIDE=$(HIDE) -C tex/
 
 clean:
-	rm -f *.map *.o $(BINLIST) core.* *.exe.stackdump *.pyc
+	rm -f *.map *.o *.o.prof $(BINLIST) $(addsuffix .prof, $(BINLIST)) core.* *.exe.stackdump *.pyc
 
 distclean: clean
 	rm -rf .depend

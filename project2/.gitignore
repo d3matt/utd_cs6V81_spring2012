@@ -4,6 +4,7 @@
 *.o
 *.exe
 *.aux
+gmon.out
 simple_test
 second_test
 paper.log
