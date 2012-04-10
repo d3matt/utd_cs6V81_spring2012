@@ -11,7 +11,7 @@
 
 
 //#define SIMPLE_DEBUG
-#ifdef  PROJ_DEBUG
+#ifdef  SIMPLE_DEBUG
 #define DBGDISP(format, args...) \
     printf("%s:%d " format "\n",__FILE__,__LINE__,  \
     ## args         \
@@ -33,46 +33,81 @@ bool ts_lt(timespec *a, timespec *b)
     return false;
 }
 
+#define NSEC_SEC 1000000000
+
+// returns the number of nanoseconds in the difference (x - y)
+uint64_t ts_sub(const timespec *x, const timespec *y)
+{
+    int64_t retval;
+    int64_t second;
+    if(x->tv_nsec < y->tv_nsec)
+    {
+        retval = x->tv_nsec - y->tv_nsec + NSEC_SEC;
+        second = x->tv_sec - y->tv_sec - 1;
+    }
+    else {
+        retval = x->tv_nsec - y->tv_nsec;
+        second = x->tv_sec - y->tv_sec;
+    }
+
+    retval += second * NSEC_SEC;
+    
+    if(retval < 0)
+    {
+        cout << "NEGATIVE VALUE!" << endl
+             << "x: " << x->tv_sec << "." << x->tv_nsec << endl
+             << "y: " << y->tv_sec << "." << y->tv_nsec << endl;
+        return 0;
+    }
+
+    return (uint64_t) retval;
+}
+
 static uint64_t counter;
 static uint64_t *tcounters;
+static uint64_t *tnsecs;
 
 static void *worker_thread(void *Arg)
 {
     worker_thread_arg * arg = (worker_thread_arg *) Arg;
     uint32_t tnum = arg->tnum;
     
-    //not sure if each thread should run for 10 seconds or overall we should run for 10 seconds...
     timespec stop;
     timespec current;
+    timespec lock1;
+    timespec lock2;
     clock_gettime( CLOCK_REALTIME, &current );
 
     stop = arg->carg->start;
     stop.tv_sec += arg->carg->num_seconds;
     
+    DBGDISP("start thread %2d : %ld.%ld", tnum, current.tv_sec, current.tv_nsec);
     while( ts_lt(&current, &(arg->carg->start) ) )
     {
-        pthread_yield();
+        //pthread_yield();
         clock_gettime( CLOCK_REALTIME, &current );
     }
     DBGDISP("start thread %2d : %ld.%ld", tnum, current.tv_sec, current.tv_nsec);
+    lock2 = current;
 
-    while( ts_lt(&current, &stop) ) {
+    while( ts_lt(&lock2, &stop) ) {
         DBGDISP("thread %u lock()", tnum);
+        clock_gettime( CLOCK_REALTIME, &lock1 );
         arg->lock->lock();
+        clock_gettime( CLOCK_REALTIME, &lock2 );
         DBGDISP("thread %u back", tnum);
         counter++;
-        tcounters[tnum]++;
-
-        //yield each time through loop to make things interesting...
-        //pthread_yield();
 
         DBGDISP("thread %u unlock()", tnum);
         arg->lock->unlock();
         DBGDISP("thread %u back", tnum);
 
+        tcounters[tnum]++;
+        tnsecs[tnum] += ts_sub(&lock2, &lock1);
+
         clock_gettime( CLOCK_REALTIME, &current );
     }
-    DBGDISP(" stop thread %2d : %ld.%ld %ld\n", tnum, current.tv_sec, current.tv_nsec, tcounters[tnum] );
+    DBGDISP(" stop thread %2d : %ld.%ld %ld", tnum, current.tv_sec, current.tv_nsec, tcounters[tnum] );
     delete arg;
     return NULL;
 }
@@ -90,6 +125,8 @@ int main(int argc, char ** argv)
     start.tv_sec += 1;
 
     tcounters = new uint64_t[carg.num_threads];
+    tnsecs = new uint64_t[carg.num_threads];
+
     carg.start=start;
 
     test_common(&carg, worker_thread);
@@ -108,6 +145,12 @@ int main(int argc, char ** argv)
     }
     if(test != counter)
         retval=1;
+    test=0;
+    for(uint32_t i=0; i < carg.num_threads; i++)
+    {
+        test += tnsecs[i];
+    }
+    cout << "total_nsec: " << test << endl;
 
     delete tcounters;
     return retval;

@@ -7,15 +7,24 @@ from string import replace
 
 def get_count(cmd):
     #print cmd
-    rc, out=commands.getstatusoutput(cmd)    
-    counter=int(out.splitlines()[-1].split()[-1])
-    #print "counter was %d" % (counter)
+    rc, out = commands.getstatusoutput(cmd)
+    counter = 0
+    total   = 0
+    for line in out.splitlines():
+        if "counter" in line:
+            counter = int( line.split()[-1])
+            continue
+        if "total_nsec" in line:
+            total = int( line.split()[-1] )
+            continue
+
     return counter
+
 
 
 def main():
 
-    types = ['ALOCK', 'TASLOCK', 'TTASLOCK', 'BACKOFF']
+    types = ['TASLOCK', 'TTASLOCK', 'BACKOFF', 'ALOCK']
     threadcounts = [1, 2, 10, 32, 64, 75, 100]
 
     log = ''
@@ -33,6 +42,7 @@ def main():
 
         for threads in threadcounts:
             cmd = './second_test %s %s' % (type, threads)
+            print cmd
 
             counts=[]
             n = 10
