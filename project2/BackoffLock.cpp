@@ -11,11 +11,9 @@
 using namespace std;
 
 Backoff::Backoff(uint32_t minDelay, uint32_t maxDelay)
-    : minDelay(minDelay), maxDelay(maxDelay), limit(maxDelay)
+    : minDelay(minDelay), maxDelay(maxDelay), limit(1)
 {
-    ifstream randseed("/dev/urandom", ios::binary);
-    uint32_t seed;
-    randseed.read((char*)&seed, 4);
+    uint32_t seed = 0x55AAFF00;
     gen.seed( seed );
 }
 
@@ -25,7 +23,11 @@ void Backoff::backoff(void)
     uint32_t delay = dist(gen);
 
     limit = min(maxDelay, 2 * limit);
-    usleep(delay);
+    
+    struct timespec req;
+    req.tv_sec = 0;
+    req.tv_nsec = delay;
+    nanosleep(&req, &req);
 }
 
 

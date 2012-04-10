@@ -32,7 +32,7 @@ default: $(BINLIST)
 %.o.prof: %.cpp
 	@ mkdir -p .depend
 	@ echo CXX $@
-	$(HIDE) $(CXX) $(CFLAGS) -c -o $@ -MMD -MF $(@:%.o.prof=.depend/$.d) $(firstword $^)
+	$(HIDE) $(CXX) $(CFLAGS) -c -pg -o $@ -MMD -MF $(@:%.o.prof=.depend/$.d) $(firstword $^)
 
 #include generated dependency files
 -include .depend/*.d
@@ -60,6 +60,11 @@ tests test: second_test
 
 .PHONY: prof tests test
 
+test-prof : prof
+	@echo PROF simple_test
+	$(HIDE) mkdir -p .profile/
+	$(HIDE) ./test_prof.py
+
 pdf: test_results
 	@echo PDF $(DISTUSER)
 	$(HIDE) cp test_results tex/
@@ -72,6 +77,7 @@ distclean: clean
 	rm -rf .depend
 	rm -rf $(DISTUSER) $(DISTUSER).zip
 	rm -rf .log
+	rm -rf .profile
 
 dist: pdf
 	rm -rf $(DISTUSER) $(DISTUSER).zip

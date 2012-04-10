@@ -2,10 +2,15 @@
 .swp
 .depend
 *.o
+*.o.prof
 *.exe
 *.aux
 gmon.out
 simple_test
 second_test
+simple_test.prof
+second_test.prof
+test_results
 paper.log
 pdflatex.log
+.profile/
