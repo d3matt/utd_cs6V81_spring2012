@@ -2,8 +2,8 @@
 gnuplot -e "set title 'throughput versus threads'; \
 		set key top left; \
 		set key box; \
-		set terminal png; \
-		set out 'ALOCK.PNG'; \
+		set terminal pdf; \
+		set out 'ALOCK.pdf'; \
 		set datafile separator ','; \
 		set xlabel 'threads'; \
 		set ylabel 'throughput';\
@@ -14,8 +14,8 @@ gnuplot -e "set title 'throughput versus threads'; \
 gnuplot -e "set title 'throughput versus threads'; \
 		set key top left; \
 		set key box; \
-		set terminal png; \
-		set out 'ALOCK2.PNG'; \
+		set terminal pdf; \
+		set out 'ALOCK2.pdf'; \
 		set datafile separator ','; \
 		set xlabel 'threads'; \
 		set ylabel 'throughput';\
