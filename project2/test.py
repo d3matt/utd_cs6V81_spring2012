@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import commands
+import json
 import numpy
 import sys
 from string import replace
@@ -18,37 +19,48 @@ def get_count(cmd):
             total = int( line.split()[-1] )
             continue
 
-    return counter
+    return total / float(counter)
 
+results={}
 
+def dot():
+    sys.stdout.write(".")
+    sys.stdout.flush()
 
 def main():
 
     types = ['TASLOCK', 'TTASLOCK', 'BACKOFF', 'ALOCK']
     threadcounts = [1, 2, 10, 32, 64, 75, 100]
 
-    log = ''
     print "Running..."
     
     os = commands.getstatusoutput('uname -si')[1]
-    cpus = open('/proc/cpuinfo').read().count('processor\t:')
+    cpuinfo = open('/proc/cpuinfo').read()
+    cpus = cpuinfo.count('processor\t:')
+    for line in cpuinfo.splitlines():
+        if "model name" in line:
+            model = line.split(':', 1)[1].strip()
+            break
 
-    log += 'machine : %s, %s CPUs\n' % (os, cpus)
-    log += 'types : %s\n' % (len(types))
-    log += 'threadcounts : %s\n' % (len(threadcounts))
-    log += '\n'
+    results['machine'] = { "os":os, "cpus":cpus, "model": model}
+    results['types'] = types
+    results['threadcounts'] = threadcounts
 
-    for type in types:
+    for ltype in types:
+
+        results[ltype]={}
 
         for threads in threadcounts:
-            cmd = './second_test %s %s' % (type, threads)
+            results[ltype][threads]={}
+            cmd = './second_test %s %s' % (ltype, threads)
             print cmd
 
             counts=[]
             n = 10
             for i in range(0,n):
                 counts.append( get_count(cmd) )
-                print ".",
+                dot()
+            print
 
             #loop was always true...
             dev  = numpy.std(counts)
@@ -61,16 +73,21 @@ def main():
                 mean = numpy.mean(counts)
                 n = ( (1.96 * dev ) / mean )
 
-            log += 'type : %s\n' % type
-            log += 'threads : %s\n' % threads
-            log += 'n : %s\n' % len(counts)
-            log += 'mean : %s\n' % numpy.mean(counts)
-            log += 'stddev : %s\n' % numpy.std(counts)
-            log += 'counts : %s\n' % counts
+            results[ltype][threads]["n"] = len(counts)
+            results[ltype][threads]["mean"] = numpy.mean(counts)
+            results[ltype][threads]["stddev"] = numpy.std(counts)
+            results[ltype][threads]["counts"] = counts
 
-            print
+            print '   type : %s' % ltype
+            print 'threads : %s' % threads
+            print '      n : %s' % len(counts)
+            print '   mean : %s' % numpy.mean(counts)
+            print ' stddev : %s' % numpy.std(counts)
+            print ' counts : %s' % counts
 
-    open('test_results', 'w+').write(log)
+
+    jstring = json.dumps(results, indent=4)
+    open('test_results', 'w+').write(jstring)
     print 'Done'
 
 if __name__ == "__main__":

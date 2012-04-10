@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
+import json
 import sys
-import string
 
 filename = 'test_results'
 try:
@@ -10,42 +10,39 @@ except:
     pass
 
 try:
-    results = open(filename, 'r').read().splitlines()
-except():
+    jstring = open(filename, 'r').read()
+    results = json.loads( jstring )
+except:
     sys.exit(0)
 latex = ''
 
+types = results["types"]
 
-machine = results[0].split(':')[1].strip()
-types = int(results[1].split(':')[1].strip())
-threadcounts = int(results[2].split(':')[1].strip())
-
-
-results = results[4:]
-
-latex += '\\subsubsection{%s}\n\n' % (string.replace(machine, '_', '\_'))
+latex += '\\subsubsection{%s, %d CPUs : %s}\n\n' % (
+    results["machine"]["os"].replace('_', '\_'),
+    results["machine"]["cpus"],
+    results["machine"]["model"] )
 latex += 'Results in tables '
-for i in range(0,types):
+for i in range(0,len(types)):
     latex += '\\ref{table_%s_%s}' % (filename, i)
-    if i != types-1:
+    if i != len(types)-1:
         latex += ', '
 latex += '\n\n'
 
-for i in range(0,types):
-    type = results[0].split(':')[1].strip()
+#pretty sure type is a reserved word
+for ltype in types:
     latex += '\\begin{table}[hp]\n'
-    latex += ' \\caption{%s lock}\n' % type
+    latex += ' \\caption{%s lock}\n' % ltype
     latex += ' \\begin{center}\n'
     latex += ' \\begin{tabular}{|r||c|c|c|}\n'
     latex += '  \\hline Number of Threads & Number of Runs & Mean & Standard Deviation \\\\ \n'
-    for j in range(0,threadcounts):
-        threads = results[1].split(':')[1].strip()
-        n = results[2].split(':')[1].strip()
-        mean = results[3].split(':')[1].strip()
-        stddev = results[4].split(':')[1].strip()
+    for threads in results["threadcounts"]:
+        ts = "%d" % (threads)
+        n = results[ltype][ts]["n"]
+        mean = results[ltype][ts]["mean"]
+        stddev = results[ltype][ts]["stddev"]
 
         latex += '  \\hline %s & %s & %s & %s \\\\ \n' % (threads, n, mean, stddev)
-        results = results[6:]
     latex += '  \\hline\n'
     latex += ' \\end{tabular}\n'
     latex += ' \\end{center}\n'
