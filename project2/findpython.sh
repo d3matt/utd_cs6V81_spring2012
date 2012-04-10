@@ -1,7 +1,7 @@
 #!/bin/bash
 
 PYTHON27=$(which python2.7 2>/dev/null)
-PYTHON26=$(which python2.7 2>/dev/null)
+PYTHON26=$(which python2.6 2>/dev/null)
 PYTHON=$(which python)
 
 if [ -n "$PYTHON27" ]; then
