@@ -49,8 +49,7 @@ class BackoffLock : public LOCK
     uint32_t maxDelay;
 
 public:
-    BackoffLock(uint32_t minDelay, uint32_t maxDelay)
-        : minDelay(minDelay), maxDelay(maxDelay) {}
+    BackoffLock(uint32_t minDelay, uint32_t maxDelay);
     ~BackoffLock() {}
     void lock(void);
     void unlock(void);

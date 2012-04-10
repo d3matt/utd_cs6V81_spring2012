@@ -11,15 +11,16 @@
 using namespace std;
 
 Backoff::Backoff(uint32_t minDelay, uint32_t maxDelay)
-    : minDelay(minDelay), maxDelay(maxDelay), limit(1)
+    : minDelay(minDelay), maxDelay(maxDelay)
 {
+    limit = min(minDelay, maxDelay);
     uint32_t seed = 0x55AAFF00;
     gen.seed( seed );
 }
 
 void Backoff::backoff(void)
 {
-    distribution_type dist(1, limit);
+    distribution_type dist(minDelay, limit);
     uint32_t delay = dist(gen);
 
     limit = min(maxDelay, 2 * limit);
@@ -30,7 +31,10 @@ void Backoff::backoff(void)
     nanosleep(&req, &req);
 }
 
-
+BackoffLock::BackoffLock(uint32_t minDelay, uint32_t maxDelay)
+        : minDelay(minDelay), maxDelay(maxDelay) 
+{
+}
 
 void BackoffLock::lock(void)
 {

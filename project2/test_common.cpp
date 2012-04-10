@@ -68,6 +68,7 @@ void parse_args(int argc, char **argv, common_args *carg)
         cerr << endl;
         exit(-1);
     }
+    carg->maxDelay = max(carg->minDelay, carg->maxDelay);
 }
 
 LOCK * create_lock(common_args *carg)
