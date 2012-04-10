@@ -1,16 +1,24 @@
 #!/usr/bin/env python
 
 import json
+import os
 import sys
 
-filename = 'test_results'
+filename = ''
+dirname = ''
+specifier = ''
 try:
-    filename = sys.argv[1]
+    dirname = sys.argv[1]
+    specifier = sys.argv[1].split('.')[-1]
 except:
-    pass
+    filename = 'test_results'
 
 try:
-    jstring = open(filename, 'r').read()
+    jstring = ''
+    if dirname == '':
+        jstring = open(filename, 'r').read()
+    else:
+        jstring = open('%s/test_results' % dirname, 'r').read()
     results = json.loads( jstring )
 except:
     sys.exit(0)
@@ -24,13 +32,21 @@ latex += '\\subsubsection{%s, %d CPUs : %s}\n\n' % (
     results["machine"]["model"] )
 latex += 'Results in tables '
 for i in range(0,len(types)):
-    latex += '\\ref{table_%s_%s}' % (filename, i)
+    latex += '\\ref{table_%s_%s}' % (specifier, i)
     if i != len(types)-1:
         latex += ', '
 latex += '\n\n'
 
 #pretty sure type is a reserved word
-for ltype in types:
+for i,ltype in enumerate(types):
+    if os.path.exists('%s/%s.pdf' % (dirname, ltype)):
+        latex += '\\begin{figure}[hp]\n'
+        latex += ' \\caption{Time in lock() vs. Number of Threads}\n'
+        latex += ' \\begin{center}\n'
+        latex += '  \\includegraphics{%s/%s.pdf}\n' % (dirname, ltype)
+        latex += ' \\end{center}\n'
+        latex += ' \\label{figure_%s_%s}\n' % (specifier, i)
+        latex += '\\end{figure}\n'
     latex += '\\begin{table}[hp]\n'
     latex += ' \\caption{%s lock}\n' % ltype
     latex += ' \\begin{center}\n'
@@ -46,7 +62,7 @@ for ltype in types:
     latex += '  \\hline\n'
     latex += ' \\end{tabular}\n'
     latex += ' \\end{center}\n'
-    latex += ' \\label{table_%s_%s}\n' % (filename, i)
+    latex += ' \\label{table_%s_%s}\n' % (specifier, i)
     latex += '\\end{table}\n\n'
 
 latex += '\\clearpage\n\n'

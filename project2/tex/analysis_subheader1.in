@@ -1,5 +1,5 @@
 
-\subsection{Throughput vs Threads}
+\subsection{Time in lock() vs Threads}
 The results below were generated using a global counter.  Each thread behaved as below:
 \begin{verbatim}
 lock();

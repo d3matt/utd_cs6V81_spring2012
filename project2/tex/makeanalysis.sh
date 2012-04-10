@@ -6,8 +6,8 @@ cat analysis_header.in > analysis.tex
 
 cat analysis_subheader1.in >> analysis.tex
 
-for file in test_results* ; do
-    ./makelatex1.py $file
+for dir in results.* ; do
+    ./makelatex1.py $dir
 done
 
 for SUB in analysis_sub1.in* ; do
