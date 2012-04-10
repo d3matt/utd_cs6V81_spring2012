@@ -21,7 +21,7 @@ try:
         jstring = open('%s/test_results' % dirname, 'r').read()
     results = json.loads( jstring )
 except:
-    sys.exit(0)
+    sys.exit(1)
 latex = ''
 
 types = results["types"]
@@ -67,5 +67,5 @@ for i,ltype in enumerate(types):
 
 latex += '\\clearpage\n\n'
 
-open('analysis_sub1.in.%s' % filename, 'w+').write(latex)
+open('analysis_sub1.in.%s' % dirname, 'w+').write(latex)
 
