@@ -25,10 +25,12 @@ void Backoff::backoff(void)
 
     limit = min(maxDelay, 2 * limit);
     
-    struct timespec req;
-    req.tv_sec = 0;
-    req.tv_nsec = delay;
-    nanosleep(&req, &req);
+    //struct timespec req;
+    //req.tv_sec = 0;
+    //req.tv_nsec = delay;
+    //nanosleep(&req, &req);
+    //cout << delay << endl;
+    usleep(delay);
 }
 
 BackoffLock::BackoffLock(uint32_t minDelay, uint32_t maxDelay)
