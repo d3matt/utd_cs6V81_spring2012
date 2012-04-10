@@ -16,6 +16,8 @@ ifeq ($(DISTUSER),)
 DISTUSER:=mjs010200
 endif
 
+PYTHON=$(shell ./findpython.sh)
+
 BINLIST=simple_test second_test
 
 COMMON_OBJECTS = TASLock.o TTASLock.o BackoffLock.o ALock.o test_common.o
@@ -56,7 +58,7 @@ second_test.prof: second_test.o.prof $(COMMON_OBJECTS_PROF)
 prof : simple_test.prof second_test.prof
 
 tests test: second_test
-	./test.py
+	$(PYTHON) ./test.py
 
 .PHONY: prof tests test
 
