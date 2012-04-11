@@ -1,9 +1,5 @@
 
-\subsection{Time in lock() vs Threads}
-The results below were generated using a global counter.  Each thread behaved as below:
-\begin{verbatim}
-lock();
-counter++;
-unlock();
-\end{verbatim}
+\subsection{Number of Threads vs Time in lock()}
+
+This section analyzes the effect of the number of threads on the time spent in the lock method for each type of lock.
 
