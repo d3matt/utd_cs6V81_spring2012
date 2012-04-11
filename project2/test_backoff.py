@@ -27,8 +27,8 @@ def dot():
 def main():
     results={}
 
-    mindelays = [1, 2, 4, 8, 16, 32]
-    maxdelays = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
+    mindelays = [1, 100, 200, 300, 400]
+    maxdelays = [1, 100, 200, 300, 400, 500, 600]
 
     os = commands.getstatusoutput('uname -si')[1]
     cpuinfo = open('/proc/cpuinfo').read()
@@ -39,9 +39,6 @@ def main():
             break
 
     results['machine'] = { "os":os, "cpus":cpus, "model": model}
-    results['types'] = types
-    results['threadcounts'] = threadcounts
-
     results['mindelays'] = mindelays
     results['maxdelays'] = maxdelays
 
