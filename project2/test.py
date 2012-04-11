@@ -29,8 +29,8 @@ def dot():
 
 def main():
 
-    types = ['TASLOCK', 'TTASLOCK', 'BACKOFF', 'ALOCK']
-    threadcounts = [1, 2, 10, 32, 64, 75, 100]
+    types = ['TASLOCK', 'TTASLOCK', 'BACKOFF', 'ALOCKYIELD', 'PTHREAD']
+    threadcounts = [1, 2, 10, 32, 64, 75, 100, 128]
 
     print "Running..."
     

@@ -20,7 +20,7 @@ PYTHON=$(shell ./findpython.sh)
 
 BINLIST=simple_test second_test
 
-COMMON_OBJECTS = TASLock.o TTASLock.o BackoffLock.o ALock.o test_common.o
+COMMON_OBJECTS = TASLock.o TTASLock.o BackoffLock.o ALockVolatile.o ALockYield.o PThreadLock.o test_common.o
 COMMON_OBJECTS_PROF = $(addsuffix .prof, $(COMMON_OBJECTS))
 
 default: $(BINLIST)
@@ -69,7 +69,7 @@ test-prof : prof
 
 pdf:
 	@echo PDF $(DISTUSER)
-	$(HIDE) $(MAKE) HIDE=$(HIDE) -C tex/
+	$(HIDE) $(MAKE) HIDE=$(HIDE) -C tex/ -B
 
 pdf-clean:
 	$(MAKE) -C tex/ clean

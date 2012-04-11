@@ -13,7 +13,9 @@
 #include "TASLock.h"
 #include "TTASLock.h"
 #include "BackoffLock.h"
-#include "ALock.h"
+#include "ALockVolatile.h"
+#include "ALockYield.h"
+#include "PThreadLock.h"
 
 using namespace std;
 
@@ -41,7 +43,13 @@ void parse_args(int argc, char **argv, common_args *carg)
             else if ( s == "BACKOFF" )
                 carg->locktype = TEST_BACKOFF;
             else if ( s == "ALOCK" )
-                carg->locktype = TEST_ALOCK;
+                carg->locktype = TEST_ALOCK_VOLATILE;
+            else if ( s == "ALOCKVOLATILE" )
+                carg->locktype = TEST_ALOCK_VOLATILE;
+            else if ( s == "ALOCKYIELD" )
+                carg->locktype = TEST_ALOCK_YIELD;
+            else if ( s == "PTHREAD" )
+                carg->locktype = TEST_PTHREAD;
             else if ( s.compare(0, 9, "MINDELAY=") == 0) 
                 carg->minDelay = u32_cast( s.substr(9, string::npos) );
             else if ( s.compare(0, 9, "MAXDELAY=") == 0)
@@ -59,7 +67,9 @@ void parse_args(int argc, char **argv, common_args *carg)
         cerr << "        TASLOCK  - Test And Set Lock" << endl;
         cerr << "        TTASLOCK - Test Test And Set Lock" << endl;
         cerr << "        BACKOFF  - exponential Backoff Lock" << endl;
-        cerr << "        ALOCK    - Anderson Lock (array based)" << endl;
+        cerr << "        ALOCKVOLATILE    - Anderson Lock (array based) using a volatile bool array" << endl;
+        cerr << "        ALOCKYIELD    - Anderson Lock (array based) using pthread_yield" << endl;
+        cerr << "        PTHREAD    - pthread_mutex_t" << endl;
         cerr << endl;
         cerr << "    other options (in the form of OPTION=VALUE)" << endl;
         cerr << "        MINDELAY=<min> - set min delay for Backoff Lock        (uint32_t)" << endl;
@@ -84,9 +94,15 @@ LOCK * create_lock(common_args *carg)
     case TEST_BACKOFF:
         cout << "initializing BackoffLock (" << carg->minDelay << ", " << carg->maxDelay << ")" << endl;
         return new BackoffLock(carg->minDelay, carg->maxDelay);
-    case TEST_ALOCK:
-        cout << "initializing ALock" << endl;
-        return new ALock(carg->num_threads);
+    case TEST_ALOCK_VOLATILE:
+        cout << "initializing ALockVolatile" << endl;
+        return new ALockVolatile(carg->num_threads);
+    case TEST_ALOCK_YIELD:
+        cout << "initializing ALockYield" << endl;
+        return new ALockYield(carg->num_threads);
+    case TEST_PTHREAD:
+        cout << "initializing PThreadLock" << endl;
+        return new PThreadLock();
     }
     return NULL;
 }

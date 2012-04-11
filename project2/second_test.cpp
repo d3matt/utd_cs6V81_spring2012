@@ -81,7 +81,6 @@ static void *worker_thread(void *Arg)
     stop = arg->carg->start;
     stop.tv_sec += arg->carg->num_seconds;
     
-    DBGDISP("start thread %2d : %ld.%ld", tnum, current.tv_sec, current.tv_nsec);
     while( ts_lt(&current, &(arg->carg->start) ) )
     {
         //pthread_yield();
@@ -105,9 +104,9 @@ static void *worker_thread(void *Arg)
         tcounters[tnum]++;
         tnsecs[tnum] += ts_sub(&lock2, &lock1);
 
-        clock_gettime( CLOCK_REALTIME, &current );
+        //clock_gettime( CLOCK_REALTIME, &current );
     }
-    DBGDISP(" stop thread %2d : %ld.%ld %ld", tnum, current.tv_sec, current.tv_nsec, tcounters[tnum] );
+    DBGDISP(" stop thread %2d : %ld.%ld %ld", tnum, lock2.tv_sec, lock2.tv_nsec, tcounters[tnum] );
     delete arg;
     return NULL;
 }
@@ -126,6 +125,11 @@ int main(int argc, char ** argv)
 
     tcounters = new uint64_t[carg.num_threads];
     tnsecs = new uint64_t[carg.num_threads];
+
+    for(uint32_t i = 0; i < carg.num_threads; i++)
+    {
+        tcounters[i] = tnsecs[i] = 0;
+    }
 
     carg.start=start;
 

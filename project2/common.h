@@ -19,7 +19,9 @@ enum locktype_t
     TEST_TASLOCK,
     TEST_TTASLOCK,
     TEST_BACKOFF,
-    TEST_ALOCK
+    TEST_ALOCK_VOLATILE,
+    TEST_ALOCK_YIELD,
+    TEST_PTHREAD
 };
 
 class common_args
