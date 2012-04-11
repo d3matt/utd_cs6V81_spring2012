@@ -2,8 +2,13 @@
 \subsection{Time in lock() vs Threads}
 The results below were generated using a global counter.  Each thread behaved as below:
 \begin{verbatim}
-lock();
-counter++;
-unlock();
+for( 1 second )
+    gettime(&time1)
+    lock();
+    gettime(&time2)
+    time_spent += time2 - time1   //time_spent is local to each thread
+    counter++;                    //counter is global
+    unlock();
 \end{verbatim}
+At the end, all the threads' time\_spent is added up then divided by counter to get the average time spent in lock().
 
