@@ -37,7 +37,7 @@ for min in mindelays:
         else:
             results[min][max] = {}
             counts = []
-            cmd = './second_test BACKOFF MINDELAY=%s MAXDELAY=%s 512' % (min, max)
+            cmd = './second_test BACKOFF MINDELAY=%s MAXDELAY=%s SECONDS=5 512' % (min, max)
             print cmd
             for i in range(0,10):
                 counts.append(get_count(cmd))

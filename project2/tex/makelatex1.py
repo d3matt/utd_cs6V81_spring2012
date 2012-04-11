@@ -30,6 +30,17 @@ latex += '\\subsubsection{%s, %d CPUs : %s}\n\n' % (
     results["machine"]["os"].replace('_', '\_'),
     results["machine"]["cpus"],
     results["machine"]["model"] )
+
+if os.path.exists('%s/test_results.pdf' % dirname):
+    latex += 'An overview graph is included in figure \\ref{figure_%s}.  This graph summarizes the performance of each lock as the number of threads increases.\n' % (specifier)
+    latex += '\\begin{figure}[hp]\n'
+    latex += ' \\caption{Time in lock() vs. Number of Threads}\n'
+    latex += ' \\begin{center}\n'
+    latex += '  \\includegraphics{%s/test_results.pdf}\n' % (dirname)
+    latex += ' \\end{center}\n'
+    latex += ' \\label{figure_%s}\n' % (specifier)
+    latex += '\\end{figure}\n'
+
 latex += 'Results in tables '
 for i in range(0,len(types)):
     latex += '\\ref{table_%s_%s}' % (specifier, i)
@@ -39,14 +50,7 @@ latex += '\n\n'
 
 #pretty sure type is a reserved word
 for i,ltype in enumerate(types):
-    if os.path.exists('%s/%s.pdf' % (dirname, ltype)):
-        latex += '\\begin{figure}[hp]\n'
-        latex += ' \\caption{Time in lock() vs. Number of Threads}\n'
-        latex += ' \\begin{center}\n'
-        latex += '  \\includegraphics{%s/%s.pdf}\n' % (dirname, ltype)
-        latex += ' \\end{center}\n'
-        latex += ' \\label{figure_%s_%s}\n' % (specifier, i)
-        latex += '\\end{figure}\n'
+
     latex += '\\begin{table}[hp]\n'
     latex += ' \\caption{%s lock}\n' % ltype
     latex += ' \\begin{center}\n'
