@@ -67,9 +67,8 @@ test-prof : prof
 	$(HIDE) mkdir -p .profile/
 	$(HIDE) ./test_prof.py
 
-pdf: test_results
+pdf:
 	@echo PDF $(DISTUSER)
-	$(HIDE) cp test_results tex/
 	$(HIDE) $(MAKE) HIDE=$(HIDE) -C tex/
 
 clean:
