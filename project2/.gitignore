@@ -13,3 +13,5 @@ second_test.prof
 paper.log
 pdflatex.log
 .profile/
+*.pdf
+*.csv

@@ -71,8 +71,13 @@ pdf:
 	@echo PDF $(DISTUSER)
 	$(HIDE) $(MAKE) HIDE=$(HIDE) -C tex/
 
-clean:
+pdf-clean:
+	$(MAKE) -C tex/ clean
+
+main-clean:
 	rm -f *.map *.o *.o.prof $(BINLIST) $(addsuffix .prof, $(BINLIST)) core.* *.exe.stackdump *.pyc
+
+clean: pdf-clean main-clean
 
 distclean: clean
 	rm -rf .depend
