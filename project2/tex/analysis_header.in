@@ -1,4 +1,16 @@
 \section{Analysis}
 
-Below are all the results of the experiments.
+The results below were generated using two global 64 bit counters, one for the `c' variable below and one for `t'.  The time in the lock was then taken as $ t / c $
+\begin{verbatim}
+t = 0
+while(timespent < SECONDS)
+{
+    lock1 = clock.gettime()
+    lock();
+    lock2 = clock.gettime()
+    t += lock2-lock1
+    c++;
+    unlock();
+}
+\end{verbatim}
 

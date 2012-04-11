@@ -24,37 +24,56 @@ def dot():
     sys.stdout.write(".")
     sys.stdout.flush()
 
-results={}
+def main():
+    results={}
 
-mindelays = [1, 2, 4, 8, 16, 32]
-maxdelays = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
+    mindelays = [1, 2, 4, 8, 16, 32]
+    maxdelays = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
 
-for min in mindelays:
-    results[min] = {}
-    for max in maxdelays:
-        if max < min:
-            pass
-        else:
-            results[min][max] = {}
-            counts = []
-            cmd = './second_test BACKOFF MINDELAY=%s MAXDELAY=%s SECONDS=5 512' % (min, max)
-            print cmd
-            for i in range(0,10):
-                counts.append(get_count(cmd))
-                dot()
-            print
+    os = commands.getstatusoutput('uname -si')[1]
+    cpuinfo = open('/proc/cpuinfo').read()
+    cpus = cpuinfo.count('processor\t:')
+    for line in cpuinfo.splitlines():
+        if "model name" in line:
+            model = line.split(':', 1)[1].strip()
+            break
 
-            print 'min: %s' % min
-            print 'max: %s' % max
-            print 'mean: %s' % numpy.mean(counts)
-            print 'stddev: %s' % numpy.std(counts)
-            print 'counts: %s' % counts
-            results[min][max]["min"] = min
-            results[min][max]["max"] = max
-            results[min][max]["n"] = len(counts)
-            results[min][max]["mean"] = numpy.mean(counts)
-            results[min][max]["stddev"] = numpy.std(counts)
-            results[min][max]["counts"] = counts
+    results['machine'] = { "os":os, "cpus":cpus, "model": model}
+    results['types'] = types
+    results['threadcounts'] = threadcounts
+
+    results['mindelays'] = mindelays
+    results['maxdelays'] = maxdelays
+
+    for min in mindelays:
+        results[min] = {}
+        for max in maxdelays:
+            if max < min:
+                pass
+            else:
+                results[min][max] = {}
+                counts = []
+                cmd = './second_test BACKOFF MINDELAY=%s MAXDELAY=%s SECONDS=5 512' % (min, max)
+                print cmd
+                for i in range(0,10):
+                    counts.append(get_count(cmd))
+                    dot()
+                print
+
+                print 'min: %s' % min
+                print 'max: %s' % max
+                print 'mean: %s' % numpy.mean(counts)
+                print 'stddev: %s' % numpy.std(counts)
+                print 'counts: %s' % counts
+                results[min][max]["min"] = min
+                results[min][max]["max"] = max
+                results[min][max]["n"] = len(counts)
+                results[min][max]["mean"] = numpy.mean(counts)
+                results[min][max]["stddev"] = numpy.std(counts)
+                results[min][max]["counts"] = counts
 
 
-open('backoff_results', 'w').write(json.dumps(results, indent=4))
+    open('backoff_results', 'w').write(json.dumps(results, indent=4))
+
+if __name__ == '__main__':
+    main()
