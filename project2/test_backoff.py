@@ -27,8 +27,8 @@ def dot():
 def main():
     results={}
 
-    mindelays = [1, 100, 200, 300, 400]
-    maxdelays = [1, 100, 200, 300, 400, 500, 600]
+    mindelays = [1, 50, 100, 150, 200]
+    maxdelays = [1, 75, 150, 225, 300, 375]
 
     os = commands.getstatusoutput('uname -si')[1]
     cpuinfo = open('/proc/cpuinfo').read()
@@ -50,7 +50,7 @@ def main():
             else:
                 results[min][max] = {}
                 counts = []
-                cmd = './second_test BACKOFF MINDELAY=%s MAXDELAY=%s SECONDS=5 512' % (min, max)
+                cmd = './second_test BACKOFF MINDELAY=%s MAXDELAY=%s SECONDS=10 512' % (min, max)
                 print cmd
                 for i in range(0,10):
                     counts.append(get_count(cmd))

@@ -56,7 +56,7 @@ def main():
 
             for threads in threadcounts:
                 results[YIELD][ltype][threads]={}
-                cmd = './second_test%s %s %s' % (suffix, ltype, threads)
+                cmd = './second_test%s %s MINDELAY=150 MAXDELAY=225 SECONDS=5 %s' % (suffix, ltype, threads)
                 print cmd
 
                 counts=[]

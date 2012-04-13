@@ -187,7 +187,7 @@ def main():
     results = read_json("backoff_results")
     #Plot the different results when varying MINDELAY and MAXDELAY
     gen_csv2(results, "backoff_results")
-    gen_csv2(results, "backoff_results")
+    gen_plot2(results, "backoff_results")
     
 
 if __name__ == "__main__":

@@ -58,9 +58,9 @@ for i,ltype in enumerate(types):
     latex += '  \\hline Number of Threads & Number of Runs & Mean & Standard Deviation \\\\ \n'
     for threads in results["threadcounts"]:
         ts = "%d" % (threads)
-        n = results[ltype][ts]["n"]
-        mean = results[ltype][ts]["mean"]
-        stddev = results[ltype][ts]["stddev"]
+        n = results["yield"][ltype][ts]["n"]
+        mean = results["yield"][ltype][ts]["mean"]
+        stddev = results["yield"][ltype][ts]["stddev"]
 
         latex += '  \\hline %s & %s & %s & %s \\\\ \n' % (threads, n, mean, stddev)
     latex += '  \\hline\n'
