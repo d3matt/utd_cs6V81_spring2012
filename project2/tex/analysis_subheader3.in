@@ -1,0 +1,5 @@
+
+\subsection{Min and Max Delays vs Time in lock()}
+
+This section analyzes the effect of the \verb+mindelay+ and \verb+maxdelay+ variables on the time spent in the lock for the \verb+BACKOFF+ lock.
+

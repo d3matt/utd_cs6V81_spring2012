@@ -1,2 +1,34 @@
 \section{Introduction}
 
+This paper analyzes several different methods of mutual exclusion using locks.
+The different locks that were used and the name used throughout this paper are listed in Table \ref{table:locks}.
+
+\begin{table}[hp]
+    \caption{Different Locks Used}
+    \begin{center}
+        \begin{tabular}{|l|l|}
+            \hline Lock & Name Used \\
+            \hline Test-and-Set & TASLOCK \\
+            \hline Test-Test-and-Set & TTASLOCK \\
+            \hline Exponential Backoff & BACKOFF \\
+            \hline Anderson Queue Lock & ALOCK \\
+            \hline \verb+pthread_mutex_t+ & PTHREAD \\
+            \hline
+        \end{tabular}
+    \end{center}
+    \label{table:locks}
+\end{table}
+
+All of these locks, except \verb+pthread_mutex_t+ are spin locks.
+Each on was implemented in two ways, using conditional comilation.
+\begin{enumerate}
+    \item \verb+volatile+ memory
+
+        A \verb+volatile+ memory location was used in the spin lock condition.
+        Volatile, in C/C++, forces to compiler to check the value before every use, but is recommended to \emph{not} be used for thread control.
+    \item \verb+pthread_yield()+
+
+        \verb+pthread_yield()+ hands control of the process back to the scheduler, which gives allows the local variable to be updated.
+        As will be shown, this method improves performance drastically.
+\end{enumerate}
+

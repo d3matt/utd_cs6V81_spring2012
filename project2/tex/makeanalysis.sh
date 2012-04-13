@@ -9,7 +9,7 @@ for dir in results.* ; do
     ( cd $dir ; ../plot.py )
 done
 
-for i in 1 2 ; do
+for i in 1 2 3 ; do
     cat analysis_subheader$i.in >> analysis.tex
     for dir in results.* ; do
         ./makelatex$i.py $dir || echo $dir failed
