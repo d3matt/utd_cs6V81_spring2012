@@ -28,14 +28,13 @@ typedef boost::random::mt19937 mt_gen;
 
 class Backoff
 {
+    mt_gen   gen_;
     uint32_t minDelay;
     uint32_t maxDelay;
     uint32_t limit;
-    mt_gen   gen;
-
 
 public:
-    Backoff(uint32_t minDelay, uint32_t maxDelay);
+    Backoff(mt_gen &gen, uint32_t minDelay, uint32_t maxDelay);
     void backoff();
 };
 
@@ -47,6 +46,8 @@ class BackoffLock : public LOCK
     volatile unsigned char state;
     uint32_t minDelay;
     uint32_t maxDelay;
+
+    mt_gen gen;
 
 public:
     BackoffLock(uint32_t minDelay, uint32_t maxDelay);

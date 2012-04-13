@@ -10,18 +10,16 @@
 
 using namespace std;
 
-Backoff::Backoff(uint32_t minDelay, uint32_t maxDelay)
-    : minDelay(minDelay), maxDelay(maxDelay)
+Backoff::Backoff(mt_gen &gen, uint32_t minDelay, uint32_t maxDelay)
+    : gen_(gen), minDelay(minDelay), maxDelay(maxDelay)
 {
     limit = min(minDelay, maxDelay);
-    uint32_t seed = 0x55AAFF00;
-    gen.seed( seed );
 }
 
 void Backoff::backoff(void)
 {
     distribution_type dist(minDelay, limit);
-    uint32_t delay = dist(gen);
+    uint32_t delay = dist(gen_);
 
     limit = min(maxDelay, 2 * limit);
     
@@ -36,11 +34,13 @@ void Backoff::backoff(void)
 BackoffLock::BackoffLock(uint32_t minDelay, uint32_t maxDelay)
         : minDelay(minDelay), maxDelay(maxDelay) 
 {
+    uint32_t seed = 0x55AAFF00;
+    gen.seed( seed );
 }
 
 void BackoffLock::lock(void)
 {
-    Backoff backoff(minDelay, maxDelay);
+    Backoff backoff(gen, minDelay, maxDelay);
     while(1)
     {
         do
