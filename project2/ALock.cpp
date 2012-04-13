@@ -18,7 +18,7 @@
 
 ALock::ALock(uint32_t capacity) : tail(0), size(capacity)
 {
-    flag = new bool[capacity];
+    flag = new volatile bool[capacity];
     for( uint32_t i = 0 ; i < capacity; i++)
         flag[i] = false;
     flag[0] = true;
@@ -28,7 +28,7 @@ ALock::ALock(uint32_t capacity) : tail(0), size(capacity)
 
 ALock::~ALock()
 {
-    bool * tmp = flag;
+    volatile bool * tmp = flag;
 
     flag = 0;
     delete tmp;
@@ -48,7 +48,9 @@ void ALock::lock(void)
     while( ! flag[slot])
     {
         //have to yield otherwise it locks up
+#ifdef YIELD
         pthread_yield();
+#endif /*YIELD*/
     }
 
     flag[slot] = false;

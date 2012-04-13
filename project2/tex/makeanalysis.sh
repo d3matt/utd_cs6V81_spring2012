@@ -6,13 +6,12 @@ cat analysis_header.in > analysis.tex
 
 
 for dir in results.* ; do
-    pushd $dir ; ../plot.py ; popd
+    ( cd $dir ; ../plot.py )
 done
 
 for i in 1 2 ; do
     cat analysis_subheader$i.in >> analysis.tex
     for dir in results.* ; do
-        pushd $dir ; ../plot.py ; popd
         ./makelatex$i.py $dir || echo $dir failed
     done
 

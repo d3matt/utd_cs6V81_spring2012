@@ -29,7 +29,7 @@ def dot():
 
 def main():
 
-    types = ['TASLOCK', 'TTASLOCK', 'BACKOFF', 'ALOCKYIELD', 'PTHREAD']
+    types = ['TASLOCK', 'TTASLOCK', 'BACKOFF', 'ALOCK', 'PTHREAD']
     threadcounts = [1, 2, 10, 32, 64, 75, 100, 128]
 
     print "Running..."
@@ -46,44 +46,48 @@ def main():
     results['types'] = types
     results['threadcounts'] = threadcounts
 
-    for ltype in types:
+    for YIELD,suffix in zip(['noyield', 'yield'], ['', '.yield']):
 
-        results[ltype]={}
+        results[YIELD] = {}
 
-        for threads in threadcounts:
-            results[ltype][threads]={}
-            cmd = './second_test %s %s' % (ltype, threads)
-            print cmd
+        for ltype in types:
 
-            counts=[]
-            n = 10
-            for i in range(0,n):
-                counts.append( get_count(cmd) )
-                dot()
-            print
+            results[YIELD][ltype]={}
 
-            #loop was always true...
-            dev  = numpy.std(counts)
-            mean = numpy.mean(counts)
-            n = ( (1.96 * dev ) / mean )
-            while ( n > len(counts) ) :
-                counts.append( get_count(cmd) )
+            for threads in threadcounts:
+                results[YIELD][ltype][threads]={}
+                cmd = './second_test%s %s %s' % (suffix, ltype, threads)
+                print cmd
 
+                counts=[]
+                n = 10
+                for i in range(0,n):
+                    counts.append( get_count(cmd) )
+                    dot()
+                print
+
+                #loop was always true...
                 dev  = numpy.std(counts)
                 mean = numpy.mean(counts)
                 n = ( (1.96 * dev ) / mean )
+                while ( n > len(counts) ) :
+                    counts.append( get_count(cmd) )
 
-            results[ltype][threads]["n"] = len(counts)
-            results[ltype][threads]["mean"] = numpy.mean(counts)
-            results[ltype][threads]["stddev"] = numpy.std(counts)
-            results[ltype][threads]["counts"] = counts
+                    dev  = numpy.std(counts)
+                    mean = numpy.mean(counts)
+                    n = ( (1.96 * dev ) / mean )
 
-            print '   type : %s' % ltype
-            print 'threads : %s' % threads
-            print '      n : %s' % len(counts)
-            print '   mean : %s' % numpy.mean(counts)
-            print ' stddev : %s' % numpy.std(counts)
-            print ' counts : %s' % counts
+                results[YIELD][ltype][threads]["n"] = len(counts)
+                results[YIELD][ltype][threads]["mean"] = numpy.mean(counts)
+                results[YIELD][ltype][threads]["stddev"] = numpy.std(counts)
+                results[YIELD][ltype][threads]["counts"] = counts
+
+                print '   type : %s' % ltype
+                print 'threads : %s' % threads
+                print '      n : %s' % len(counts)
+                print '   mean : %s' % numpy.mean(counts)
+                print ' stddev : %s' % numpy.std(counts)
+                print ' counts : %s' % counts
 
 
     jstring = json.dumps(results, indent=4)

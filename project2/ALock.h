@@ -8,7 +8,7 @@
 
 class ALock : public LOCK
 {
-    bool           *flag;
+    volatile bool  *flag;
     uint64_t        tail;
     uint64_t        size;
     uint32_t        curslot;

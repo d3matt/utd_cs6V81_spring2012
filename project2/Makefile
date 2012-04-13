@@ -18,9 +18,10 @@ endif
 
 PYTHON=$(shell ./findpython.sh)
 
-BINLIST=simple_test second_test
+BINLIST=simple_test second_test simple_test.yield second_test.yield
 
-COMMON_OBJECTS = TASLock.o TTASLock.o BackoffLock.o ALockVolatile.o ALockYield.o PThreadLock.o test_common.o
+COMMON_OBJECTS = TASLock.o TTASLock.o BackoffLock.o ALock.o PThreadLock.o test_common.o
+COMMON_OBJECTS_YIELD = $(addsuffix .yield, $(COMMON_OBJECTS))
 COMMON_OBJECTS_PROF = $(addsuffix .prof, $(COMMON_OBJECTS))
 
 default: $(BINLIST)
@@ -36,6 +37,11 @@ default: $(BINLIST)
 	@ echo CXX $@
 	$(HIDE) $(CXX) $(CFLAGS) -c -pg -o $@ -MMD -MF $(@:%.o.prof=.depend/$.d) $(firstword $^)
 
+%.o.yield: %.cpp
+	@ mkdir -p .depend
+	@ echo CXX $@
+	$(HIDE) $(CXX) $(CFLAGS) -DYIELD -c -o $@ -MMD -MF $(@:%.o.yield=.depend/$.d) $(firstword $^)
+
 #include generated dependency files
 -include .depend/*.d
 
@@ -44,6 +50,14 @@ simple_test: simple_test.o $(COMMON_OBJECTS)
 	$(HIDE) $(LD) $(LDFLAGS) -o $@ $^
 
 second_test: second_test.o $(COMMON_OBJECTS)
+	@ echo LD $@
+	$(HIDE) $(LD) $(LDFLAGS) -o $@ $^
+
+simple_test.yield: simple_test.o.yield $(COMMON_OBJECTS_YIELD)
+	@ echo LD $@
+	$(HIDE) $(LD) $(LDFLAGS) -o $@ $^
+
+second_test.yield: second_test.o.yield $(COMMON_OBJECTS_YIELD)
 	@ echo LD $@
 	$(HIDE) $(LD) $(LDFLAGS) -o $@ $^
 
@@ -75,7 +89,7 @@ pdf-clean:
 	$(MAKE) -C tex/ clean
 
 main-clean:
-	rm -f *.map *.o *.o.prof $(BINLIST) $(addsuffix .prof, $(BINLIST)) core.* *.exe.stackdump *.pyc
+	rm -f *.map *.o *.o.prof *.o.yield $(BINLIST) $(addsuffix .prof, $(BINLIST)) core.* *.exe.stackdump *.pyc
 
 clean: pdf-clean main-clean
 

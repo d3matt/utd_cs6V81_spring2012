@@ -17,7 +17,9 @@ void TASLock::lock()
 {
     while( AO_test_and_set(&state) == AO_TS_SET)
     {
+#ifdef YIELD
         pthread_yield();
+#endif /*YIELD*/
     }
 }
 

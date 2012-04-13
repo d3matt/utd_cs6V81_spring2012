@@ -13,8 +13,7 @@
 #include "TASLock.h"
 #include "TTASLock.h"
 #include "BackoffLock.h"
-#include "ALockVolatile.h"
-#include "ALockYield.h"
+#include "ALock.h"
 #include "PThreadLock.h"
 
 using namespace std;
@@ -43,11 +42,7 @@ void parse_args(int argc, char **argv, common_args *carg)
             else if ( s == "BACKOFF" )
                 carg->locktype = TEST_BACKOFF;
             else if ( s == "ALOCK" )
-                carg->locktype = TEST_ALOCK_VOLATILE;
-            else if ( s == "ALOCKVOLATILE" )
-                carg->locktype = TEST_ALOCK_VOLATILE;
-            else if ( s == "ALOCKYIELD" )
-                carg->locktype = TEST_ALOCK_YIELD;
+                carg->locktype = TEST_ALOCK;
             else if ( s == "PTHREAD" )
                 carg->locktype = TEST_PTHREAD;
             else if ( s.compare(0, 9, "MINDELAY=") == 0) 
@@ -94,12 +89,9 @@ LOCK * create_lock(common_args *carg)
     case TEST_BACKOFF:
         cout << "initializing BackoffLock (" << carg->minDelay << ", " << carg->maxDelay << ")" << endl;
         return new BackoffLock(carg->minDelay, carg->maxDelay);
-    case TEST_ALOCK_VOLATILE:
-        cout << "initializing ALockVolatile" << endl;
-        return new ALockVolatile(carg->num_threads);
-    case TEST_ALOCK_YIELD:
-        cout << "initializing ALockYield" << endl;
-        return new ALockYield(carg->num_threads);
+    case TEST_ALOCK:
+        cout << "initializing ALock" << endl;
+        return new ALock(carg->num_threads);
     case TEST_PTHREAD:
         cout << "initializing PThreadLock" << endl;
         return new PThreadLock();

@@ -30,7 +30,9 @@ void TTASLock::lock()
         while( state == AO_TS_SET)
         {
             //DBGDISP("yielding %lu", syscall(__NR_gettid) );
-            //pthread_yield();
+#ifdef YIELD
+            pthread_yield();
+#endif /*YIELD*/
         }
         if( AO_test_and_set(&state) != AO_TS_SET) {
             return;
