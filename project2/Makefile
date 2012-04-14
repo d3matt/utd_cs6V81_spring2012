@@ -71,7 +71,7 @@ second_test.prof: second_test.o.prof $(COMMON_OBJECTS_PROF)
 
 prof : simple_test.prof second_test.prof
 
-tests test: second_test
+tests test: second_test second_test.yield
 	$(PYTHON) ./test.py
 
 .PHONY: prof tests test
