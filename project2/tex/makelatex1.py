@@ -47,10 +47,11 @@ for i in range(0,len(types)):
     if i != len(types)-1:
         latex += ', '
 latex += '\n\n'
+latex += '\\clearpage\n\n'
+open('analysis_sub1.in.%s' % dirname, 'w+').write(latex)
 
-#pretty sure type is a reserved word
+latex = ''
 for i,ltype in enumerate(types):
-
     latex += '\\begin{table}[hp]\n'
     latex += ' \\caption{%s lock}\n' % ltype
     latex += ' \\begin{center}\n'
@@ -70,6 +71,4 @@ for i,ltype in enumerate(types):
     latex += '\\end{table}\n\n'
 
 latex += '\\clearpage\n\n'
-
-open('analysis_sub1.in.%s' % dirname, 'w+').write(latex)
-
+open('analysis_appendix.in', 'a').write(latex)

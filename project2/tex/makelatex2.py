@@ -31,6 +31,16 @@ latex += '\\subsubsection{%s, %d CPUs : %s}\n\n' % (
     results["machine"]["cpus"],
     results["machine"]["model"] )
 
+for ltype in types:
+    if os.path.exists('%s/test_results-%s.pdf' % (dirname, ltype)):
+        latex += 'An overview graph is included in Figure \\ref{figure:yield_%s_%s}.  This graph summarizes the performance of %s with and without \\verb+pthread_yield()+ as the number of threads increases.\n' % (specifier, ltype, ltype)
+        latex += '\\begin{figure}[hp]\n'
+        latex += ' \\caption{Time in lock() for %s vs. Number of Threads}\n' % ltype
+        latex += ' \\begin{center}\n'
+        latex += '  \\includegraphics{%s/test_results-%s.pdf}\n' % (dirname, ltype)
+        latex += ' \\end{center}\n'
+        latex += ' \\label{figure:yield_%s_%s}\n' % (specifier, ltype)
+        latex += '\\end{figure}\n\n'
 
 latex += 'Data in tables '
 for ltype in types:
@@ -42,16 +52,13 @@ for ltype in types:
 latex = latex[:-2]
 latex += '\n\n'
 
+latex += '\\clearpage\n\n'
+open('analysis_sub2.in.%s' % dirname, 'w+').write(latex)
+
+latex = ''
+
 for ltype in types:
     if os.path.exists('%s/test_results-%s.pdf' % (dirname, ltype)):
-        latex += 'An overview graph is included in Figure \\ref{figure:yield_%s_%s}.  This graph summarizes the performance of %s with and without \\verb+pthread_yield()+ as the number of threads increases.\n' % (specifier, ltype, ltype)
-        latex += '\\begin{figure}[hp]\n'
-        latex += ' \\caption{Time in lock() for %s vs. Number of Threads}\n' % ltype
-        latex += ' \\begin{center}\n'
-        latex += '  \\includegraphics{%s/test_results-%s.pdf}\n' % (dirname, ltype)
-        latex += ' \\end{center}\n'
-        latex += ' \\label{figure:yield_%s_%s}\n' % (specifier, ltype)
-        latex += '\\end{figure}\n\n'
         latex += '\\begin{table}[hp]\n'
         latex += ' \\caption{%s lock}\n' % ltype
         latex += ' \\begin{center}\n'
@@ -81,7 +88,5 @@ for ltype in types:
         latex += ' \\label{table:yield_%s_%s}\n' % (specifier, ltype)
         latex += '\\end{table}\n\n'
 
-latex += '\\clearpage\n\n'
-
-open('analysis_sub2.in.%s' % dirname, 'w+').write(latex)
+open('analysis_appendix.in', 'a').write(latex)
 

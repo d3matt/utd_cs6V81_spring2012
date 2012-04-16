@@ -4,6 +4,9 @@ rm analysis.tex &> /dev/null
 
 cat analysis_header.in > analysis.tex
 
+echo '\section{Appendix}
+Below is the data that was used to generate all the figures
+' > analysis_appendix.in 
 
 for dir in results.* ; do
     ( cd $dir ; ../plot.py )
@@ -20,3 +23,6 @@ for i in 1 2 3 ; do
     done
 
 done
+
+cp analysis_appendix.in appendix.tex
+

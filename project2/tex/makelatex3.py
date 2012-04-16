@@ -42,6 +42,11 @@ if os.path.exists('%s/backoff_results.pdf' % dirname):
 
 latex += 'Data in table \\ref{table_%s_backoff}\n\n' % (specifier)
 
+latex += '\\clearpage\n\n'
+open('analysis_sub3.in.%s' % specifier, 'w+').write(latex)
+
+latex = ''
+
 latex += '\\begin{table}[hp]\n'
 latex += ' \\caption{Backoff Results}\n'
 latex += ' \\begin{center}\n'
@@ -64,7 +69,4 @@ latex += ' \\end{center}\n'
 latex += ' \\label{table_%s_backoff}\n' % (specifier)
 latex += '\\end{table}\n\n'
 
-latex += '\\clearpage\n\n'
-
-open('analysis_sub3.in.%s' % specifier, 'w+').write(latex)
-
+open('analysis_appendix.in', 'a').write(latex)
