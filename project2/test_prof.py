@@ -3,7 +3,7 @@
 import subprocess
 
 execs = ['simple_test', 'second_test']
-types = ['ALOCK', 'TASLOCK', 'TTASLOCK', 'BACKOFF']
+types = ['ALOCK', 'TASLOCK', 'TTASLOCK', 'BACKOFF', 'PTHREAD']
 threadcounts = [1, 2, 10, 64, 75, 100]
 
 for execname in execs:

@@ -72,6 +72,7 @@ def gen_csv2(results, filename):
 
 def gen_csv3(results, filename):
 
+    cpus = results['machine']['cpus']
     for t in results["types"]:
         if t in ['BACKOFF', 'PTHREAD']:
             continue
@@ -82,6 +83,8 @@ def gen_csv3(results, filename):
         fout.write(line)
 
         for tc in results["threadcounts"]:
+            if tc > cpus:
+                continue
             line = str(tc)
             line+=","
 
@@ -124,9 +127,9 @@ plot """ % (
     plot_string = plot_string[:-2]
 
     cmd = "gnuplot -e \"%s\"" % (plot_string)
-    print cmd
+    #print cmd
     rc, out = commands.getstatusoutput(cmd)
-    print out
+    #print out
 
 def gen_plot2(results, filename):
     plot_string = """ \\
@@ -168,9 +171,9 @@ plot """ % (
     plot_string = plot_string[:-2]
 
     cmd = "gnuplot -e \"%s\"" % (plot_string)
-    print cmd
+    #print cmd
     rc, out = commands.getstatusoutput(cmd)
-    print out
+    #print out
 
 def main():
 

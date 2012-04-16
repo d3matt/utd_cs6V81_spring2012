@@ -30,7 +30,7 @@ def dot():
 def main():
 
     types = ['TASLOCK', 'TTASLOCK', 'BACKOFF', 'ALOCK', 'PTHREAD']
-    threadcounts = [1, 2, 10, 32, 64, 75, 100, 128]
+    threadcounts = [32, 64, 75, 100, 128]
 
     print "Running..."
     
@@ -41,6 +41,10 @@ def main():
         if "model name" in line:
             model = line.split(':', 1)[1].strip()
             break
+
+    for x in range(cpus):
+        threadcounts.append(x+1)
+    threadcounts.sort()
 
     results['machine'] = { "os":os, "cpus":cpus, "model": model}
     results['types'] = types
