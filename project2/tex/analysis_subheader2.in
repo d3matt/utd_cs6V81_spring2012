@@ -1,5 +1,5 @@
 
 \subsection{pthread\_yield() vs Time in lock()}
-
+\label{section:yield}
 This section analyzes the effect of using \verb+pthread_yield()+ on the time spent calling \verb+lock()+.
 

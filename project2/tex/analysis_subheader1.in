@@ -2,4 +2,7 @@
 \subsection{Number of Threads vs Time in lock()}
 
 This section analyzes the effect of the number of threads on the time spent in the lock method for each type of lock.
+For this section we use the \verb+pthread_yield()+ method.
+As is shown in Section \ref{section:yield}, for thread counts below the number of CPUs in a system, the two methods are comparable.
+Using \verb+pthread_yield()+ allows us to run tests with threadcounts much higher than the CPU count in a system, which is much better at illustrating effective differences between the algorithms.
 
