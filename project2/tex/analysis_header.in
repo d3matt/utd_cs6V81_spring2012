@@ -1,6 +1,7 @@
 \section{Analysis}
 
-The results below were generated using two global 64 bit counters, one for the `c' variable below and one for `t'.  The time in the lock was then taken as $ t / c $
+The results below were generated using two global 64 bit counters, one for the `$c$' variable below and one for `$t$'.
+The time in the lock was then taken as $ t / c $
 \begin{verbatim}
 t = 0
 while(timespent < SECONDS)
