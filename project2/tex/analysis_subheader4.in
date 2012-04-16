@@ -1,0 +1,24 @@
+
+\subsection{Results of Profiling}
+
+The following results came from running on a Linux x86\_64 with an AMD Phenom II X6 1055T Processor (6 discrete cores).
+These results are generated using each algorithm running with 100 threads and using \verb+pthread_yield()+ (in order to have up to 100 threads).
+The results are summarized in Table \ref{table:profile}
+
+\begin{table}[hp]
+    \caption{Profile Results}
+    \begin{center}
+    \begin{tabular}{|r||c|c|c|}
+        \hline Algorithm & \% of Overall Time in lock() & \% of Time in worker\_thread & \% of Time in unlock() \\
+        \hline ALOCK & 96.75 & 2.85 & 0.40 \\
+        \hline TASLOCK & 77.20 & 22.87 & 0 \\
+        \hline TTASLOCK & 75.06 & 25.02 & 0 \\
+        \hline BACKOFF & 59.71 & 7.57 & 0.84 \\
+        \hline PTHREAD & 0.0 & 66.72 & 33.36 \\
+        \hline
+    \end{tabular}
+    \label{table:profile}
+\end{table}
+
+\clearpage
+

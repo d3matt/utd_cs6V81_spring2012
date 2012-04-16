@@ -1,12 +1,9 @@
-#include <cstdio>
-
-#include <atomic_ops.h>
 #include <atomic_ops.h>
 #include <pthread.h>
 
-#include <cstdio>
-
 #include "PThreadLock.h"
+
+using namespace std;
 
 PThreadLock::PThreadLock()
 {

@@ -24,5 +24,7 @@ for i in 1 2 3 ; do
 
 done
 
+cat analysis_subheader4.in >> analysis.tex
+
 cp analysis_appendix.in appendix.tex
 

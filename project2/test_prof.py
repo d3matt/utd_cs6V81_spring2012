@@ -10,7 +10,7 @@ for execname in execs:
     for type in types:
         for threads in threadcounts:
             subprocess.call(['./%s.prof' % execname , str(type), str(threads)])
-            process = subprocess.Popen(['gprof', '%s.prof' % execname], stdout=subprocess.PIPE)
+            process = subprocess.Popen(['gprof', '-b', '%s.prof' % execname], stdout=subprocess.PIPE)
             output = process.communicate()[0]
 
             filename = '.profile/%s.profile.%s.%s' % (execname, type, threads)

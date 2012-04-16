@@ -35,7 +35,7 @@ default: $(BINLIST)
 %.o.prof: %.cpp
 	@ mkdir -p .depend
 	@ echo CXX $@
-	$(HIDE) $(CXX) $(CFLAGS) -c -pg -o $@ -MMD -MF $(@:%.o.prof=.depend/$.d) $(firstword $^)
+	$(HIDE) $(CXX) $(CFLAGS) -c -DYIELD -pg -o $@ -MMD -MF $(@:%.o.prof=.depend/$.d) $(firstword $^)
 
 %.o.yield: %.cpp
 	@ mkdir -p .depend
