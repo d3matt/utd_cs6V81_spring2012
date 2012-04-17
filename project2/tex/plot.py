@@ -12,6 +12,7 @@ def read_json(filename):
 def gen_csv1(results, filename):
 
     fout = open("%s.csv" % (filename),"w")
+    cpus = results['machine']['cpus']
 
     line = "#"
     for tt in results["types"]:
@@ -25,11 +26,13 @@ def gen_csv1(results, filename):
     fout.write(line)
 
     for tc in results["threadcounts"]:
+        if tc > cpus:
+            continue
         line = str(tc)
         line+=","
 
         for tt in results["types"]:
-            line+=str(results["yield"][tt][str(tc)]["mean"])
+            line+=str(results["noyield"][tt][str(tc)]["mean"])
             line+=","
         line=line[:-1]
         line+='\n'
@@ -72,7 +75,6 @@ def gen_csv2(results, filename):
 
 def gen_csv3(results, filename):
 
-    cpus = results['machine']['cpus']
     for t in results["types"]:
         if t in ['BACKOFF', 'PTHREAD']:
             continue
@@ -83,8 +85,6 @@ def gen_csv3(results, filename):
         fout.write(line)
 
         for tc in results["threadcounts"]:
-            if tc > cpus:
-                continue
             line = str(tc)
             line+=","
 

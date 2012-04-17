@@ -17,6 +17,7 @@ The results are summarized in Table \ref{table:profile}
         \hline PTHREAD & 0.0 & 66.72 & 33.36 \\
         \hline
     \end{tabular}
+    \end{center}
     \label{table:profile}
 \end{table}
 
