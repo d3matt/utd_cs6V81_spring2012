@@ -1,5 +1,7 @@
 \section{Introduction}
 
+\subsection{Different Locks}
+
 This paper analyzes several different methods of mutual exclusion using locks.
 The different locks that were used and the name used throughout this paper are listed in Table \ref{table:locks}.
 
@@ -20,7 +22,7 @@ The different locks that were used and the name used throughout this paper are l
 \end{table}
 
 All of these locks, except \verb+pthread_mutex_t+ are spin locks.
-Each on was implemented in two ways, using conditional comilation.
+Each one was implemented in two ways, using conditional comilation.
 \begin{enumerate}
     \item \verb+volatile+ memory
 
@@ -31,4 +33,25 @@ Each on was implemented in two ways, using conditional comilation.
         \verb+pthread_yield()+ hands control of the process back to the scheduler, which gives allows the local variable to be updated.
         As will be shown, this method improves performance in most cases as the number of threads exceeds the number of processors.
 \end{enumerate}
+
+\pagebreak
+
+\subsection{CPUS}
+
+The results below were generated using four different CPU as listed in Table \ref{table:CPUs}.
+
+\begin{table}[hp]
+    \caption{Different CPUs Used}
+    \begin{center}
+        \begin{tabular}{|l|l|l|l|}
+            \hline Model & CPUs & Cores/Threads & Notes  \\
+            \hline Intel E8400 & 1 & 2 & Core2  \\
+            \hline AMD 1055T & 1 & 6 & Phenom \\
+            \hline Intel L5640 & 2 & 6/12 & NUMA, Westmere, Hyperthreading  \\
+            \hline Intel E7-4830 & 4 & 8/16 & NUMA, Westmere, Hyperthreading  \\
+            \hline
+        \end{tabular}
+    \end{center}
+    \label{table:CPUs}
+\end{table}
 
