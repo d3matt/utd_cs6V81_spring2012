@@ -136,6 +136,7 @@ def gen_plot2(results, filename):
     plot_string = """ \\
 set key top left; \\
 set key box; \\
+set key title 'MIN Values';\\
 set terminal pdf; \\
 set out '%s.pdf'; \\
 set datafile separator ','; \\
@@ -145,7 +146,7 @@ plot """ % (
     filename)
 
     for i, min in enumerate(results["mindelays"]):
-        plot_string += "'%s.csv' using 1:%d with linespoints pointtype %d title '%s (Min)', " % (
+        plot_string += "'%s.csv' using 1:%d with linespoints pointtype %d title '%s us', " % (
             filename, i+2, POINTS[i], min)
     plot_string = plot_string[:-2]
 
