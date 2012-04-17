@@ -168,7 +168,7 @@ set ylabel 'Time in lock (ns)';\\
 plot """ % (
     filename)
 
-    for i, tt in enumerate(["Without Yield", "With Yield"]):
+    for i, tt in enumerate(["With Yield", "Without Yield"]):
         plot_string += "'%s.csv' using 1:%d with linespoints pointtype %d title '%s', " % (
             filename, i+2, POINTS[i], tt)
     plot_string = plot_string[:-2]
