@@ -6,4 +6,10 @@ On a linux machine, run 'make'
 Note: requires boost-devel, libatomic_ops (libatomic_ops-devel in fedora 16)
 
 To invoke:
-./simple_test <num_threads> [TASLOCK] [TTASLOCK] [BACKOFF] [ALOCK]
+./simple_test [num_threads] [ [TASLOCK]|[TTASLOCK]|[BACKOFF]|[ALOCK] ] [MINDELAY=<seconds>] [MAXDELAY=<seconds>]
+
+This program spawns <num_threads> and each thread increments a counter to 10000.
+OR
+./second_test ... [SECONDS=<seconds>]
+This program runs for <seconds> and each thread increments a counter.  At the end it reports what the counter reached and total nanoseconds spent calling the lock() method.
+
