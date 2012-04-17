@@ -80,7 +80,7 @@ def gen_csv3(results, filename):
             continue
         fout = open("%s-%s.csv" % (filename, t), "w")
 
-        line = "#Without Yield,With Yield\n"
+        line = "#With Yield,Without Yield\n"
 
         fout.write(line)
 
