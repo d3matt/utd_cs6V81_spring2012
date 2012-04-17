@@ -103,5 +103,5 @@ dist: pdf
 	rm -rf $(DISTUSER) $(DISTUSER).zip
 	mkdir -p $(DISTUSER)
 	if [ -f tex/paper.pdf ] ; then  mv -f tex/paper.pdf $(DISTUSER)/ ; fi
-	cp *.h *.cpp *.py README Makefile $(DISTUSER)/
+	cp *.h *.cpp *.py *.sh README Makefile $(DISTUSER)/
 	zip $(DISTUSER).zip $(DISTUSER)/*
