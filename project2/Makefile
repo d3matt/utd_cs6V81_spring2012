@@ -102,6 +102,6 @@ distclean: clean
 dist: pdf
 	rm -rf $(DISTUSER) $(DISTUSER).zip
 	mkdir -p $(DISTUSER)
-	if [ -f tex/results.pdf ] ; then  mv -f tex/results.pdf $(DISTUSER)/ ; fi
+	if [ -f tex/paper.pdf ] ; then  mv -f tex/paper.pdf $(DISTUSER)/ ; fi
 	cp *.h *.cpp *.py README Makefile $(DISTUSER)/
 	zip $(DISTUSER).zip $(DISTUSER)/*
