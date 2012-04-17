@@ -116,6 +116,7 @@ set key box; \\
 set terminal pdf; \\
 set out '%s.pdf'; \\
 set datafile separator ','; \\
+set logscale y; \\
 set xlabel 'Number of Threads'; \\
 set ylabel 'Time in lock (ns)';\\
 plot """ % (
@@ -138,6 +139,7 @@ set key box; \\
 set terminal pdf; \\
 set out '%s.pdf'; \\
 set datafile separator ','; \\
+set logscale y; \\
 set xlabel 'Max Delay (us)'; \\
 set ylabel 'Time in lock() (ns)';\\
 plot """ % (
@@ -160,6 +162,7 @@ set key box; \\
 set terminal pdf; \\
 set out '%s.pdf'; \\
 set datafile separator ','; \\
+set logscale y; \\
 set xlabel 'Number of Threads'; \\
 set ylabel 'Time in lock (ns)';\\
 plot """ % (
