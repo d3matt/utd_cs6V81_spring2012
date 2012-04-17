@@ -5,9 +5,6 @@
 
 class PThreadLock : public LOCK
 {
-    //state has two possible values:
-    //  AO_TS_SET
-    //  AO_TS_CLEAR
     pthread_mutex_t mutex;
 
 public:
