@@ -33,7 +33,7 @@ latex += '\\subsubsection{%s, %d CPUs : %s}\n\n' % (
 if os.path.exists('%s/backoff_results.pdf' % dirname):
     latex += 'An overview graph is included in Figure \\ref{figure:backoff_%s}.  This graph summarizes the performance of BACKOFF lock as the MIN and MAX delays vary.\n' % (specifier)
     latex += '\\begin{figure}[hp]\n'
-    latex += ' \\caption{Time in lock() vs. Number of Threads}\n'
+    latex += ' \\caption{Time in lock() vs. MAX Value (MIN value is each plot)}\n'
     latex += ' \\begin{center}\n'
     latex += '  \\includegraphics{%s/backoff_results.pdf}\n' % (dirname)
     latex += ' \\end{center}\n'
