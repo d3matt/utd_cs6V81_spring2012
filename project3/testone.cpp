@@ -6,6 +6,9 @@
 #include <stdint.h>
 #include <stdio.h>
 
+#include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string.hpp>
+
 #include "Node.h"
 #include "LockStack.h"
 #include "Common.h"
@@ -31,32 +34,57 @@ void *worker(void *args)
     return NULL;
 }
 
-int main()
+int main(int argc, char *argv[])
 {
-    LockStack stack;
-    pthread_t ids[6];
-    ThreadArgs *args = new ThreadArgs[6];
-    for(int i = 0; i < 6; i++)
+    Stack *stack = NULL;
+    uint32_t numthreads = 2;
+
+    for(int i = 1; i < argc; i++)
     {
-        args[i].stack = &stack;
+        string arg = argv[i];
+        boost::algorithm::to_upper(arg);
+
+        if(arg == "LOCK")               stack = new LockStack();
+        else if(arg == "LOCKFREE")      stack = NULL;
+        else if(arg == "ELIMINATION")   stack = NULL;
+        else if(arg.compare(0, 11, "NUMTHREADS=") == 0) numthreads = boost::lexical_cast<uint32_t>(arg.substr(11));
+        else cerr << "BAD ARG: " << arg << endl;
+
+    }
+
+    if(stack == NULL)
+    {
+        stack = new LockStack();
+    }
+
+    pthread_t *ids = new pthread_t[numthreads];
+    ThreadArgs *args = new ThreadArgs[numthreads];
+    for(int i = 0; i < numthreads; i++)
+    {
+        args[i].stack = stack;
         args[i].tid = i;
         pthread_create(&ids[i], NULL, worker, &args[i]);
     }
 
-    for(int i = 0; i < 6; i++)
+    for(int i = 0; i < numthreads; i++)
     {
         pthread_join(ids[i], NULL);
     }
 
-    delete [] args;
-
     Node *n;
-    while ( (n = stack.pop()) != NULL)
+    uint32_t items = 0;
+    while ( (n = stack->pop()) != NULL)
     {
         //printf("%d\n", n->data);
+        items++;
         delete n;
         n = NULL;
     }
+
+    printf("%u\n", items);
+
+    delete [] ids;
+    delete [] args;
 
     return 0;
 }
