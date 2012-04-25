@@ -47,8 +47,22 @@ int main(int argc, char *argv[])
         if(arg == "LOCK")               stack = new LockStack();
         else if(arg == "LOCKFREE")      stack = NULL;
         else if(arg == "ELIMINATION")   stack = NULL;
-        else if(arg.compare(0, 11, "NUMTHREADS=") == 0) numthreads = boost::lexical_cast<uint32_t>(arg.substr(11));
-        else cerr << "BAD ARG: " << arg << endl;
+
+        else if(arg.compare(0, 11, "NUMTHREADS=") == 0)
+        {
+            numthreads = boost::lexical_cast<uint32_t>(arg.substr(11));
+        }
+        else
+        {
+            cerr << "BAD ARG: " << arg << endl;
+            cerr << "USAGE:" << endl
+                 << "   testone [LOCK|LOCKFREE|ELIMINATION] [NUMTHREADS=<threads>]" << endl
+                 << "   LOCK        uses the locking stack" << endl
+                 << "   LOCKFREE    uses the lockfree stack" << endl
+                 << "   ELIMINATION uses the elimination backoff stack" << endl
+                 << "   NUMTHREADS  determines how many threads run" << endl;
+            return 1;
+        }
 
     }
 
@@ -59,14 +73,14 @@ int main(int argc, char *argv[])
 
     pthread_t *ids = new pthread_t[numthreads];
     ThreadArgs *args = new ThreadArgs[numthreads];
-    for(int i = 0; i < numthreads; i++)
+    for(uint32_t i = 0; i < numthreads; i++)
     {
         args[i].stack = stack;
         args[i].tid = i;
         pthread_create(&ids[i], NULL, worker, &args[i]);
     }
 
-    for(int i = 0; i < numthreads; i++)
+    for(uint32_t i = 0; i < numthreads; i++)
     {
         pthread_join(ids[i], NULL);
     }
