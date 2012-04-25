@@ -1,0 +1,11 @@
+.*.swp
+.swp
+.depend
+*.o
+*.prof
+*.yield
+*.exe
+*.aux
+*.pdf
+*.csv
+testone

@@ -18,9 +18,9 @@ endif
 
 PYTHON=$(shell ./findpython.sh)
 
-BINLIST=
+BINLIST=testone
 
-COMMON_OBJECTS =
+COMMON_OBJECTS=LockStack.o
 
 default: $(BINLIST)
 
@@ -33,15 +33,14 @@ default: $(BINLIST)
 %.o.prof: %.cpp
 	@ mkdir -p .depend
 	@ echo CXX $@
-	$(HIDE) $(CXX) $(CFLAGS) -c -DYIELD -pg -o $@ -MMD -MF $(@:%.o.prof=.depend/$.d) $(firstword $^)
-
-%.o.yield: %.cpp
-	@ mkdir -p .depend
-	@ echo CXX $@
-	$(HIDE) $(CXX) $(CFLAGS) -DYIELD -c -o $@ -MMD -MF $(@:%.o.yield=.depend/$.d) $(firstword $^)
+	$(HIDE) $(CXX) $(CFLAGS) -c pg -o $@ -MMD -MF $(@:%.o.prof=.depend/$.d) $(firstword $^)
 
 #include generated dependency files
 -include .depend/*.d
+
+testone: testone.o $(COMMON_OBJECTS)
+	@ echo LD $@
+	$(HIDE) $(LD) $(CFLAGS) $(LDFLAGS) -o $@ $^
 
 tests test: $(BINLIST)
 	$(PYTHON) ./test.py
