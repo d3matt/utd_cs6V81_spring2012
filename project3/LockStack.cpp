@@ -15,7 +15,6 @@ LockStack::~LockStack()
     {
         Node *n = head;
         head = head->next;
-        printf("%p\n", head);
         delete n;
         n = NULL;
     }

@@ -11,6 +11,7 @@
 
 #include "Node.h"
 #include "LockStack.h"
+#include "LockFreeStack.h"
 #include "Common.h"
 
 using namespace std;
@@ -45,7 +46,7 @@ int main(int argc, char *argv[])
         boost::algorithm::to_upper(arg);
 
         if(arg == "LOCK")               stack = new LockStack();
-        else if(arg == "LOCKFREE")      stack = NULL;
+        else if(arg == "LOCKFREE")      stack = new LockFreeStack();
         else if(arg == "ELIMINATION")   stack = NULL;
 
         else if(arg.compare(0, 11, "NUMTHREADS=") == 0)

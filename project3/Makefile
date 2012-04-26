@@ -20,7 +20,7 @@ PYTHON=$(shell ./findpython.sh)
 
 BINLIST=testone
 
-COMMON_OBJECTS=LockStack.o
+COMMON_OBJECTS=LockStack.o LockFreeStack.o
 
 default: $(BINLIST)
 
