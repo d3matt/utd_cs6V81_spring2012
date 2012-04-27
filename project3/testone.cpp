@@ -35,6 +35,8 @@ mt_gen gen;
 distribution_type dist(0,1);
 variate_generator zeroone(gen, dist);
 
+Stack *globalstack;
+
 bool operator< (timespec &left, timespec &right)
 {
     if(left.tv_sec > right.tv_sec)
@@ -62,12 +64,15 @@ void *worker(void *args)
         clock_gettime(CLOCK_REALTIME, &current);
     }
 
+    globalstack = stack;
+
     printf("Thread %u starting\n", tid);
     for(int i = 0; i < 10000; i++)
     {
         Node *n;
-        if(zeroone() < 0.2)
+        if(zeroone() < 0.5)
         {
+            //printf("%u attempting push\n", tid);
             n = new Node((tid*10000) + i);
             stack->push(n);
             //printf("%u pushed: %d\n", tid, n->data);
@@ -75,6 +80,7 @@ void *worker(void *args)
         }
         else
         {
+            //printf("%u attempting pop\n", tid);
             n = stack->pop();
             if(n != NULL)
             {
@@ -103,6 +109,12 @@ int main(int argc, char *argv[])
     
     parseArgs(options, argc, argv);
     testCommon(options, worker);
+
+    Node *n;
+    while((n = globalstack->pop()) != NULL)
+    {
+        printf("%d\n", n->data);
+    }
 
     return 0;
 }

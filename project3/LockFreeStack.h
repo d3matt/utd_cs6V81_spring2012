@@ -38,7 +38,7 @@ class LockFreeStack : public Stack
     void backoff();
 
 public:
-    LockFreeStack() : head(NULL), limit(1) {gen.seed(0x55AAFF00);}
+    LockFreeStack() : head(new Node), limit(1) {gen.seed(0x55AAFF00);}
     ~LockFreeStack();
     void push(Node *node);
     Node *pop(void);

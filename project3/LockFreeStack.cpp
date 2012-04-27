@@ -5,7 +5,7 @@
 
 LockFreeStack::~LockFreeStack()
 {
-    while(head != NULL)
+    while(head->next != NULL)
     {
         Node *n = pop();
         delete n;
@@ -15,19 +15,28 @@ LockFreeStack::~LockFreeStack()
 
 bool LockFreeStack::trypush(Node *node)
 {
-    Node *oldhead = head;
-    node->next = oldhead;
-    return __sync_bool_compare_and_swap(&head, oldhead, node);
+    Node *n = head->next;
+    node->next = n;
+    return __sync_bool_compare_and_swap(&head->next, n, node);
 }
 
 Node* LockFreeStack::trypop(void)
 {
+    /*
     Node *oldhead = head;
     while(oldhead != NULL && !__sync_bool_compare_and_swap(&head, oldhead, NULL)) oldhead = head;
     if(oldhead != NULL)
         if(__sync_bool_compare_and_swap(&head, NULL, oldhead->next))
             return oldhead;
-    return NULL;
+    */
+    Node *n = NULL;
+    do 
+    {
+        n = head->next;
+        if(n == NULL)
+            break;
+    } while( !__sync_bool_compare_and_swap(&head->next, n, n->next));
+    return n;
 }
 
 void LockFreeStack::backoff(void)
@@ -57,6 +66,6 @@ void LockFreeStack::push(Node *node)
 Node* LockFreeStack::pop(void)
 {
     Node *n = NULL;
-    while(const_cast<volatile Node *>(head) != NULL && (n = trypop()) == NULL);
+    while(const_cast<volatile Node *>(head->next) != NULL && (n = trypop()) == NULL);
     return n;
 }
