@@ -32,13 +32,13 @@ void LockStack::push(Node *node)
 Node* LockStack::pop(void)
 {
     Node *node = NULL;
+    pthread_mutex_lock(&mutex);
     if(head != NULL)
     {
-        pthread_mutex_lock(&mutex);
         node = head;
         head = head->next;
-        pthread_mutex_unlock(&mutex);
     }
+    pthread_mutex_unlock(&mutex);
 
     return node;
 }

@@ -1,105 +1,108 @@
 
 #include <iostream>
 #include <string>
-#include <sstream>
-#include <pthread.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <time.h>
 
-#include <boost/lexical_cast.hpp>
-#include <boost/algorithm/string.hpp>
+#if BOOST_VERSION == 103301
 
-#include "Node.h"
-#include "LockStack.h"
-#include "LockFreeStack.h"
+#include <boost/random/uniform_real.hpp>
+#include <boost/random/mersenne_twister.hpp>
+#include <boost/random/variate_generator.hpp>
+
+typedef boost::uniform_real<> distribution_type;
+typedef boost::mt19937 mt_gen;
+typedef boost::variate_generator variate_generator;
+
+#else
+
+#include <boost/random/mersenne_twister.hpp>
+#include <boost/random/uniform_real_distribution.hpp>
+#include <boost/random/variate_generator.hpp>
+
+typedef boost::random::uniform_real_distribution<> distribution_type;
+typedef boost::random::mt19937 mt_gen;
+typedef boost::random::variate_generator<mt_gen, distribution_type> variate_generator;
+
+#endif
+
 #include "Common.h"
 
 using namespace std;
+
+mt_gen gen;
+distribution_type dist(0,1);
+variate_generator zeroone(gen, dist);
+
+bool operator< (timespec &left, timespec &right)
+{
+    if(left.tv_sec > right.tv_sec)
+        return false;
+    else if(left.tv_nsec < right.tv_nsec)
+        return true;
+    else if(left.tv_sec < right.tv_sec)
+        return true;
+    return false;
+}
 
 void *worker(void *args)
 {
     ThreadArgs *targs = (ThreadArgs*)args;
     Stack *stack = targs->stack;
     uint32_t tid = targs->tid;
-    Node *n;
 
-    printf("Thread %u starting...\n", tid);
+    uint64_t pushcount = 0, popcount = 0;
 
+    timespec current;
+    clock_gettime(CLOCK_REALTIME, &current);
+    
+    while( current < targs->options->starttime ) 
+    {
+        clock_gettime(CLOCK_REALTIME, &current);
+    }
+
+    printf("Thread %u starting\n", tid);
     for(int i = 0; i < 10000; i++)
     {
-        n = new Node((tid*10000) + i);
-        stack->push(n);
-        pthread_yield(); //Let's make this interesting...
+        Node *n;
+        if(zeroone() < 0.2)
+        {
+            n = new Node((tid*10000) + i);
+            stack->push(n);
+            //printf("%u pushed: %d\n", tid, n->data);
+            pushcount++;
+        }
+        else
+        {
+            n = stack->pop();
+            if(n != NULL)
+            {
+                //printf("%u popped: %d\n", tid, n->data);
+                //delete n;
+                //n = NULL;
+                popcount++;
+            }
+            else
+            {
+                i--;
+            }
+        }
     }
+
+    printf("%u: pushed %lu, popped %lu\n", tid, pushcount, popcount);
 
     return NULL;
 }
 
 int main(int argc, char *argv[])
 {
-    Stack *stack = NULL;
-    uint32_t numthreads = 2;
+    Options options;
 
-    for(int i = 1; i < argc; i++)
-    {
-        string arg = argv[i];
-        boost::algorithm::to_upper(arg);
-
-        if(arg == "LOCK")               stack = new LockStack();
-        else if(arg == "LOCKFREE")      stack = new LockFreeStack();
-        else if(arg == "ELIMINATION")   stack = NULL;
-
-        else if(arg.compare(0, 11, "NUMTHREADS=") == 0)
-        {
-            numthreads = boost::lexical_cast<uint32_t>(arg.substr(11));
-        }
-        else
-        {
-            cerr << "BAD ARG: " << arg << endl;
-            cerr << "USAGE:" << endl
-                 << "   testone [LOCK|LOCKFREE|ELIMINATION] [NUMTHREADS=<threads>]" << endl
-                 << "   LOCK        uses the locking stack" << endl
-                 << "   LOCKFREE    uses the lockfree stack" << endl
-                 << "   ELIMINATION uses the elimination backoff stack" << endl
-                 << "   NUMTHREADS  determines how many threads run" << endl;
-            return 1;
-        }
-
-    }
-
-    if(stack == NULL)
-    {
-        stack = new LockStack();
-    }
-
-    pthread_t *ids = new pthread_t[numthreads];
-    ThreadArgs *args = new ThreadArgs[numthreads];
-    for(uint32_t i = 0; i < numthreads; i++)
-    {
-        args[i].stack = stack;
-        args[i].tid = i;
-        pthread_create(&ids[i], NULL, worker, &args[i]);
-    }
-
-    for(uint32_t i = 0; i < numthreads; i++)
-    {
-        pthread_join(ids[i], NULL);
-    }
-
-    Node *n;
-    uint32_t items = 0;
-    while ( (n = stack->pop()) != NULL)
-    {
-        //printf("%d\n", n->data);
-        items++;
-        delete n;
-        n = NULL;
-    }
-
-    printf("%u\n", items);
-
-    delete [] ids;
-    delete [] args;
+    gen.seed(time(0));
+    
+    parseArgs(options, argc, argv);
+    testCommon(options, worker);
 
     return 0;
 }

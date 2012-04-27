@@ -22,12 +22,12 @@ bool LockFreeStack::trypush(Node *node)
 
 Node* LockFreeStack::trypop(void)
 {
-    Node *newhead = head->next;
-    Node *n = head;
-    if(__sync_bool_compare_and_swap(&head, n, newhead))
-        return n;
-    else
-        return NULL;
+    Node *oldhead = head;
+    while(oldhead != NULL && !__sync_bool_compare_and_swap(&head, oldhead, NULL)) oldhead = head;
+    if(oldhead != NULL)
+        if(__sync_bool_compare_and_swap(&head, NULL, oldhead->next))
+            return oldhead;
+    return NULL;
 }
 
 void LockFreeStack::backoff(void)
