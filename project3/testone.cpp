@@ -35,6 +35,7 @@ mt_gen gen;
 distribution_type dist(0,1);
 variate_generator zeroone(gen, dist);
 
+uint64_t totalpushcount, totalpopcount;
 Stack *globalstack;
 
 bool operator< (timespec &left, timespec &right)
@@ -72,19 +73,21 @@ void *worker(void *args)
         Node *n;
         if(zeroone() < 0.5)
         {
-            //printf("%u attempting push\n", tid);
             n = new Node((tid*10000) + i);
             stack->push(n);
-            //printf("%u pushed: %d\n", tid, n->data);
+#ifdef PROJ_DEBUG
+            printf("%u pushed: %d\n", tid, n->data);
+#endif
             pushcount++;
         }
         else
         {
-            //printf("%u attempting pop\n", tid);
             n = stack->pop();
             if(n != NULL)
             {
-                //printf("%u popped: %d\n", tid, n->data);
+#ifdef PROJ_DEBUG
+                printf("%u popped: %d\n", tid, n->data);
+#endif
                 //delete n;
                 //n = NULL;
                 popcount++;
@@ -96,7 +99,11 @@ void *worker(void *args)
         }
     }
 
+#ifdef PROJ_DEBUG
     printf("%u: pushed %lu, popped %lu\n", tid, pushcount, popcount);
+#endif
+    totalpushcount += pushcount;
+    totalpopcount += popcount;
 
     return NULL;
 }
@@ -104,8 +111,10 @@ void *worker(void *args)
 int main(int argc, char *argv[])
 {
     Options options;
+    uint64_t mypopcount;
 
     gen.seed(time(0));
+    totalpushcount = totalpopcount = mypopcount = 0;
     
     parseArgs(options, argc, argv);
     testCommon(options, worker);
@@ -113,8 +122,13 @@ int main(int argc, char *argv[])
     Node *n;
     while((n = globalstack->pop()) != NULL)
     {
+#ifdef PROP_DEBUG
         printf("%d\n", n->data);
+#endif
+        mypopcount++;
     }
+
+    printf("%lu pushed, %lu popped, %lu leftover\n", totalpushcount, totalpopcount, mypopcount);
 
     return 0;
 }

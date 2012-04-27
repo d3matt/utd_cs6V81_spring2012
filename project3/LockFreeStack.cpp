@@ -58,7 +58,9 @@ void LockFreeStack::push(Node *node)
     while(!trypush(node))
     {
         backoff();
-        //printf("Failed to push node: %p\n", node);
+#ifdef PROJ_DEBUG
+        printf("Failed to push node: %p\n", node);
+#endif
     }
     return;
 }
