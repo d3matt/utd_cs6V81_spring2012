@@ -2,5 +2,8 @@
 
 """Test the project..."""
 
-print "dummy"
+import subprocess
+
+for threads in [ 1, 2, 6, 10 ]:
+    subprocess.call(['./testone', 'ELIMINATION', 'NUMTHREADS=%s' % threads])
 

@@ -22,13 +22,6 @@ bool LockFreeStack::trypush(Node *node)
 
 Node* LockFreeStack::trypop(void)
 {
-    /*
-    Node *oldhead = head;
-    while(oldhead != NULL && !__sync_bool_compare_and_swap(&head, oldhead, NULL)) oldhead = head;
-    if(oldhead != NULL)
-        if(__sync_bool_compare_and_swap(&head, NULL, oldhead->next))
-            return oldhead;
-    */
     Node *n = NULL;
     do 
     {
@@ -41,7 +34,7 @@ Node* LockFreeStack::trypop(void)
 
 void LockFreeStack::backoff(void)
 {
-    distribution_type dist(1, limit);
+    int_distribution_type dist(1, limit);
     uint32_t delay = dist(gen);
 
     struct timespec req;
@@ -58,7 +51,7 @@ void LockFreeStack::push(Node *node)
     while(!trypush(node))
     {
         backoff();
-#ifdef PROJ_DEBUG
+#ifdef PROJ_DEBUG2
         printf("Failed to push node: %p\n", node);
 #endif
     }

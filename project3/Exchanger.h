@@ -1,10 +1,32 @@
 #ifndef EXCHANGER_H
 #define EXCHANGER_H
 
-#include <cstdlib>
+#include <exception>
+#include <sstream>
+#include <string>
 #include <stdint.h>
 
 #include "Node.h"
+
+class TimeoutException : public std::exception
+{
+public:
+    std::string str;
+    virtual const char* what() const throw()
+    {
+        return str.c_str();
+    }
+    TimeoutException(): str("Timed Out") {}
+    TimeoutException(std::string s) : str(s) {}
+
+    TimeoutException(std::string msg, const char * f, uint32_t l)
+    {
+        std::stringstream ss;
+        ss << msg << " (" << f << ":" << l << ")";
+        str = ss.str();
+    }
+    ~TimeoutException() throw() {}
+};
 
 class Exchanger
 {
@@ -23,8 +45,9 @@ class Exchanger
             data = (uint64_t)n | (state & 0x3);
         }
 
-        Node *get(void)
+        Node *get(ExchangeState *state)
         {
+            *state = (ExchangeState)(data&0x3);
             return (Node*) (data&(~0x3));
         }
 
@@ -41,7 +64,7 @@ class Exchanger
     Slot slot;
 
 public:
-    Node * exchange(Node *n, uint64_t nanos);
+    Node * exchange(Node *n);
 };
 
 class EliminationArray

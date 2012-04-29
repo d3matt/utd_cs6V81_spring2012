@@ -1,6 +1,8 @@
 #ifndef NODE_H
 #define NODE_H
 
+#include <cstdlib> // For NULL
+
 class Node
 {
 public:

@@ -2,8 +2,10 @@ CC=gcc
 CXX=g++
 LD=$(CXX)
 CFLAGS=-Wall -g -fexceptions -O2
-#uncomment to enable extra debug messages
-#CFLAGS+=-DPROJ_DEBUG
+#uncomment to enable extra debug messages 3 is the most debugs, 1 is the least
+#CFLAGS+=-DPROJ_DEBUG3
+#CFLAGS+=-DPROJ_DEBUG2
+#CFLAGS+=-DPROJ_DEBUG1
 LDFLAGS=-lpthread -lrt
 
 #pretty printing of CXX and LD

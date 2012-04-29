@@ -17,6 +17,7 @@
 #include "Common.h"
 #include "LockStack.h"
 #include "LockFreeStack.h"
+#include "Elimination.h"
 
 using namespace std;
 
@@ -66,6 +67,8 @@ void testCommon(Options &options, void *func(void *))
         break;
     case ELIMINATION:
         printf("ELIMINATION");
+        stack = new EliminationStack();
+        break;
     case LOCK:
     default:
         printf("LOCK");
@@ -77,9 +80,8 @@ void testCommon(Options &options, void *func(void *))
     vector<pthread_t> ids;
     vector<ThreadArgs*> args;
     timespec start;
-    clock_gettime( CLOCK_REALTIME, &start );
-    start.tv_sec += 1;
-    options.starttime = start;
+    clock_gettime( CLOCK_REALTIME, &options.starttime );
+    options.starttime.tv_sec += 100;
 
     for(uint32_t i = 0; i < options.numthreads; i++)
     {
@@ -89,6 +91,10 @@ void testCommon(Options &options, void *func(void *))
         ids.push_back(p);
         args.push_back(arg);
     }
+
+    clock_gettime( CLOCK_REALTIME, &start );
+
+    options.starttime.tv_sec = start.tv_sec + 1;
 
     for(uint32_t i = 0; i < options.numthreads; i++)
     {
