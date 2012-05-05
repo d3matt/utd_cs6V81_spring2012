@@ -20,6 +20,7 @@ public:
     uint32_t numthreads;
     uint32_t seconds;
     timespec starttime;
+    timespec stoptime;
     Options() : stacktype(LOCK), numthreads(2), seconds(1) {}
 };
 

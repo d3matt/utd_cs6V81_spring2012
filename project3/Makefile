@@ -20,7 +20,7 @@ endif
 
 PYTHON=$(shell ./findpython.sh)
 
-BINLIST=testone
+BINLIST=testone testtwo
 
 COMMON_OBJECTS=$(addsuffix .o, LockStack LockFreeStack Exchanger Elimination TestCommon)
 
@@ -41,6 +41,10 @@ default: $(BINLIST)
 -include .depend/*.d
 
 testone: testone.o $(COMMON_OBJECTS)
+	@ echo LD $@
+	$(HIDE) $(LD) $(CFLAGS) $(LDFLAGS) -o $@ $^
+
+testtwo: testtwo.o $(COMMON_OBJECTS)
 	@ echo LD $@
 	$(HIDE) $(LD) $(CFLAGS) $(LDFLAGS) -o $@ $^
 

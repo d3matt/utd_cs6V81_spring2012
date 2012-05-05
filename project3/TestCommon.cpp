@@ -82,6 +82,7 @@ void testCommon(Options &options, void *func(void *))
     timespec start;
     clock_gettime( CLOCK_REALTIME, &options.starttime );
     options.starttime.tv_sec += 100;
+    options.stoptime = options.starttime;
 
     for(uint32_t i = 0; i < options.numthreads; i++)
     {
@@ -95,6 +96,7 @@ void testCommon(Options &options, void *func(void *))
     clock_gettime( CLOCK_REALTIME, &start );
 
     options.starttime.tv_sec = start.tv_sec + 1;
+    options.stoptime.tv_sec = options.starttime.tv_sec + options.seconds;
 
     for(uint32_t i = 0; i < options.numthreads; i++)
     {
