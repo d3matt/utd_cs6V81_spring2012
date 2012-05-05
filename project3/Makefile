@@ -1,7 +1,7 @@
 CC=gcc
 CXX=g++
 LD=$(CXX)
-CFLAGS=-Wall -g -fexceptions -O2
+CFLAGS+=-Wall -g -fexceptions -O2
 #uncomment to enable extra debug messages 3 is the most debugs, 1 is the least
 #CFLAGS+=-DPROJ_DEBUG3
 #CFLAGS+=-DPROJ_DEBUG2
@@ -61,7 +61,7 @@ pdf-clean:
 	$(MAKE) -C tex/ clean
 
 main-clean:
-	rm -f *.map *.o $(BINLIST) core.* *.exe.stackdump *.pyc
+	rm -f *.map *.o $(BINLIST) core.* *.exe.stackdump *.pyc *\~
 
 clean: pdf-clean main-clean
 

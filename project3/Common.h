@@ -6,6 +6,27 @@
 
 #include "Stack.h"
 
+
+#ifdef PROJ_DEBUG3
+#define PROJ_DEBUG2
+#define DEBUG3(fmt, args...) printf(fmt, ## args)
+#else
+#define DEBUG3(...)
+#endif
+
+#ifdef PROJ_DEBUG2
+#define PROJ_DEBUG1
+#define DEBUG2(fmt, args...) printf(fmt, ## args)
+#else
+#define DEBUG2(...)
+#endif
+
+#ifdef PROJ_DEBUG1
+#define DEBUG1(fmt, args...) printf(fmt, ## args)
+#else
+#define DEBUG1(...)
+#endif
+
 enum StackType
 {
     LOCK,

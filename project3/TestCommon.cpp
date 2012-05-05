@@ -58,25 +58,22 @@ void parseArgs(Options & options, int argc, char *argv[])
 void testCommon(Options &options, void *func(void *))
 {
     Stack *stack;
-    printf("Using ");
     switch(options.stacktype)
     {
     case LOCKFREE:
-        printf("LOCKFREE");
+        DEBUG1("LOCKFREE with %u threads\n", options.numthreads);
         stack = new LockFreeStack();
         break;
     case ELIMINATION:
-        printf("ELIMINATION");
+        DEBUG1("ELIMINATION with %u threads\n", options.numthreads);
         stack = new EliminationStack();
         break;
     case LOCK:
     default:
-        printf("LOCK");
+        DEBUG1("LOCK with %u threads\n", options.numthreads);
         stack = new LockStack();
     }
 
-    printf(" with %u threads\n", options.numthreads);
-       
     vector<pthread_t> ids;
     vector<ThreadArgs*> args;
     timespec start;

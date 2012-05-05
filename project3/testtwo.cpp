@@ -8,14 +8,6 @@
 #include "Common.h"
 #include "Random.h"
 
-#ifdef PROJ_DEBUG3
-#define PROJ_DEBUG2
-#endif
-
-#ifdef PROJ_DEBUG2
-#define PROJ_DEBUG1
-#endif
-
 using namespace std;
 
 mt_gen gen;
@@ -31,7 +23,6 @@ void *worker(void *args)
     Stack *stack = targs->stack;
     uint32_t tid = targs->tid;
     timespec *stoptime = &targs->options->stoptime;
-    //printf("stoptime.tv_sec = %ld, stoptime.tv_nsec = %ld\n", stoptime.tv_sec, stoptime.tv_nsec);
 
     uint64_t pushcount = 0, popcount = 0;
 
@@ -45,36 +36,26 @@ void *worker(void *args)
 
     globalstack = stack;
 
-    printf("Thread %u starting\n", tid);
+    DEBUG1("Thread %u starting\n", tid);
     int i = 0;
     do
     {
         Node *n;
         if(zeroone() < 0.5)
         {
-#ifdef PROJ_DEBUG3
-            printf("%u trying to push\n", tid);
-#endif
+            DEBUG3("%u trying to push\n", tid);
             n = new Node((tid*10000) + i);
             stack->push(n);
-#ifdef PROJ_DEBUG2
-            printf("%u pushed: %d\n", tid, n->data);
-#endif
+            DEBUG2("%u pushed: %d\n", tid, n->data);
             pushcount++;
         }
         else
         {
-#ifdef PROJ_DEBUG3
-            printf("%u trying to pop\n", tid);
-#endif
+            DEBUG3("%u trying to pop\n", tid);
             n = stack->pop();
             if(n != NULL)
             {
-#ifdef PROJ_DEBUG2
-                printf("%u popped: %d\n", tid, n->data);
-#endif
-                //delete n;
-                //n = NULL;
+                DEBUG2("%u popped: %d\n", tid, n->data);
                 popcount++;
             }
             else
@@ -86,9 +67,7 @@ void *worker(void *args)
         clock_gettime(CLOCK_REALTIME, &current);
     } while(current < *stoptime);
 
-#ifdef PROJ_DEBUG1
-    printf("%u: pushed %lu, popped %lu\n", tid, pushcount, popcount);
-#endif
+    DEBUG1("%u: pushed %lu, popped %lu\n", tid, pushcount, popcount);
     totalpushcount += pushcount;
     totalpopcount += popcount;
 
@@ -109,13 +88,13 @@ int main(int argc, char *argv[])
     Node *n;
     while((n = globalstack->pop()) != NULL)
     {
-#ifdef PROJ_DEBUG3
-        printf("%d\n", n->data);
-#endif
+        DEBUG3("%d\n", n->data);
         mypopcount++;
     }
 
-    printf("%lu pushed, %lu popped, %lu leftover\n", totalpushcount, totalpopcount, mypopcount);
+    DEBUG1("%lu pushed, %lu popped, %lu leftover\n", totalpushcount, totalpopcount, mypopcount);
+
+    printf("%lu stack operations\n", totalpushcount + totalpopcount);
 
     return 0;
 }
