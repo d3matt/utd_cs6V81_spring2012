@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <time.h>
 
+#include "GarbageCollector.h"
 #include "Common.h"
 #include "Random.h"
 
@@ -16,6 +17,9 @@ real_variate_generator zeroone(gen, dist);
 
 uint64_t totalpushcount, totalpopcount;
 Stack *globalstack;
+#ifdef USE_GC
+GarbageCollector GC;
+#endif
 
 void *worker(void *args)
 {
@@ -23,6 +27,9 @@ void *worker(void *args)
     Stack *stack = targs->stack;
     uint32_t tid = targs->tid;
     timespec *stoptime = &targs->options->stoptime;
+    #ifdef USE_GC
+    GCNode* gcn = GC.reg();
+    #endif
 
     uint64_t pushcount = 0, popcount = 0;
 
@@ -44,7 +51,11 @@ void *worker(void *args)
         if(zeroone() < 0.5)
         {
             DEBUG3("%u trying to push\n", tid);
+            #ifdef USE_GC
+            n = gcn->alloc((tid*10000) + i);
+            #else
             n = new Node((tid*10000) + i);
+            #endif
             stack->push(n);
             DEBUG2("%u pushed: %d\n", tid, n->data);
             pushcount++;
@@ -57,6 +68,9 @@ void *worker(void *args)
             {
                 DEBUG2("%u popped: %d\n", tid, n->data);
                 popcount++;
+                #ifdef USE_GC
+                gcn->clean(n);
+                #endif
             }
             else
             {
@@ -70,7 +84,9 @@ void *worker(void *args)
     DEBUG1("%u: pushed %lu, popped %lu\n", tid, pushcount, popcount);
     totalpushcount += pushcount;
     totalpopcount += popcount;
-
+    #ifdef USE_GC
+    GC.dereg(gcn);
+    #endif
     return NULL;
 }
 
@@ -90,6 +106,7 @@ int main(int argc, char *argv[])
     {
         DEBUG3("%d\n", n->data);
         mypopcount++;
+        delete n;
     }
 
     DEBUG1("%lu pushed, %lu popped, %lu leftover\n", totalpushcount, totalpopcount, mypopcount);

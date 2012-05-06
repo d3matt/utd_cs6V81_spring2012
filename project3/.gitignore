@@ -2,6 +2,7 @@
 .swp
 .depend
 *.o
+*.GC
 *.prof
 *.yield
 *.exe

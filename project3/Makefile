@@ -11,6 +11,9 @@ LDFLAGS=-lpthread -lrt
 #pretty printing of CXX and LD
 ifeq ($(HIDE),)
 HIDE:= @
+MSG:= echo &> /dev/null
+else
+MSG:= echo
 endif
 
 #definable user
@@ -20,32 +23,43 @@ endif
 
 PYTHON=$(shell ./findpython.sh)
 
-BINLIST=testone testtwo
+BINLIST=testone testtwo testtwo.GC
 
 COMMON_OBJECTS=$(addsuffix .o, LockStack LockFreeStack Exchanger Elimination TestCommon)
+COMMON_OBJECTS_GC = $(addsuffix .GC, $(COMMON_OBJECTS)) GarbageCollector.o.GC
+
 
 default: $(BINLIST)
 
 # default compile rule
 .cpp.o:
 	@ mkdir -p .depend
-	@ echo CXX $@
+	@ $(MSG) CXX $@
 	$(HIDE) $(CXX) $(CFLAGS) -c -o $@ -MMD -MF $(@:%.o=.depend/%.d) $(firstword $^)
 
 %.o.prof: %.cpp
 	@ mkdir -p .depend
-	@ echo CXX $@
+	@ $(MSG) CXX $@
 	$(HIDE) $(CXX) $(CFLAGS) -c pg -o $@ -MMD -MF $(@:%.o.prof=.depend/$.d) $(firstword $^)
+
+%.o.GC: %.cpp
+	@ mkdir -p .depend
+	@ $(MSG) CXX $@
+	$(HIDE) $(CXX) $(CFLAGS) -c -D USE_GC -o $@ -MMD -MF $(@:%.o.prof=.depend/$.d) $(firstword $^)
 
 #include generated dependency files
 -include .depend/*.d
 
 testone: testone.o $(COMMON_OBJECTS)
-	@ echo LD $@
+	@ $(MSG) LD $@
 	$(HIDE) $(LD) $(CFLAGS) $(LDFLAGS) -o $@ $^
 
 testtwo: testtwo.o $(COMMON_OBJECTS)
-	@ echo LD $@
+	@ $(MSG) LD $@
+	$(HIDE) $(LD) $(CFLAGS) $(LDFLAGS) -o $@ $^
+
+testtwo.GC: testtwo.o.GC $(COMMON_OBJECTS_GC)
+	@ $(MSG) LD $@
 	$(HIDE) $(LD) $(CFLAGS) $(LDFLAGS) -o $@ $^
 
 tests test: $(BINLIST)
@@ -54,14 +68,14 @@ tests test: $(BINLIST)
 .PHONY: tests test
 
 pdf:
-	@echo PDF $(DISTUSER)
+	@ $(MSG) PDF $(DISTUSER)
 	$(HIDE) $(MAKE) HIDE=$(HIDE) -C tex/ -B
 
 pdf-clean:
 	$(MAKE) -C tex/ clean
 
 main-clean:
-	rm -f *.map *.o $(BINLIST) core.* *.exe.stackdump *.pyc *\~
+	rm -f *.map *.o *.o.GC $(BINLIST) core.* *.exe.stackdump *.pyc *\~
 
 clean: pdf-clean main-clean
 
