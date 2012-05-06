@@ -11,10 +11,8 @@ LDFLAGS=-lpthread -lrt
 #pretty printing of CXX and LD
 ifeq ($(HIDE),)
 HIDE:= @
-MSG:= echo &> /dev/null
-else
-MSG:= echo
 endif
+MSG = $(if $(HIDE),echo,echo &> /dev/null)
 
 #definable user
 ifeq ($(DISTUSER),)
