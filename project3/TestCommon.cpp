@@ -99,4 +99,11 @@ void testCommon(Options &options, void *func(void *))
     {
         pthread_join(ids[i], NULL);
     }
+
+    while(args.size() > 0)
+    {
+        ThreadArgs *arg = args.back();
+        args.pop_back();
+        delete arg;
+    }
 }
