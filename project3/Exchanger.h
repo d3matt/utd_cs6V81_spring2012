@@ -58,7 +58,7 @@ class Exchanger
             return __sync_bool_compare_and_swap(&data, oldData, newData);
         }
 
-        Slot() : data(NULL) {}
+        Slot() : data(0) {}
     };
 
     Slot slot;
