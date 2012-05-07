@@ -82,8 +82,8 @@ void *worker(void *args)
     } while(current < *stoptime);
 
     DEBUG1("%u: pushed %lu, popped %lu\n", tid, pushcount, popcount);
-    totalpushcount += pushcount;
-    totalpopcount += popcount;
+    __sync_fetch_and_add(&totalpushcount, pushcount);
+    __sync_fetch_and_add(&totalpopcount, popcount);
     #ifdef USE_GC
     GC.dereg(gcn);
     #endif
