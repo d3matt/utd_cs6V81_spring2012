@@ -7,7 +7,7 @@ import json
 import numpy
 import os
 import sys
-from subprocess import check_output
+from subprocess import Popen,PIPE
 
 def dump_os():
     (sysname, nodename, release, version, machine) = os.uname()
@@ -18,7 +18,7 @@ def dot():
     sys.stdout.flush()
 
 def run(qtype, threads):
-    output = check_output(['./testtwo', qtype, 'NUMTHREADS=%d' % threads])
+    output = Popen(['./testtwo', qtype, 'NUMTHREADS=%d' % threads], stdout=PIPE).communicate()[0]
     return float(output.split()[0])
     
     
