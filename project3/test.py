@@ -19,7 +19,12 @@ def dot():
 
 def run(qtype, threads):
     output = Popen(['./testtwo', qtype, 'NUMTHREADS=%d' % threads], stdout=PIPE).communicate()[0]
-    return float(output.split()[0])
+    try:
+        retval = float(output.split()[0])
+    except:
+        print "ERR: output was '%s'" % (output)
+        sys.exit(-1)
+    return retval
     
     
     
