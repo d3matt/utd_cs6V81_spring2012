@@ -21,10 +21,11 @@ endif
 
 PYTHON=$(shell ./findpython.sh)
 
-BINLIST=testone testtwo testtwo.GC
+BINLIST=testone testtwo testtwo.GC testtwo.prof
 
 COMMON_OBJECTS=$(addsuffix .o, LockStack LockFreeStack Exchanger Elimination TestCommon)
 COMMON_OBJECTS_GC = $(addsuffix .GC, $(COMMON_OBJECTS)) GarbageCollector.o.GC
+COMMON_OBJECTS_PROF = $(addsuffix .prof, $(COMMON_OBJECTS))
 
 
 default: $(BINLIST)
@@ -38,7 +39,7 @@ default: $(BINLIST)
 %.o.prof: %.cpp
 	@ mkdir -p .depend
 	@ $(MSG) CXX $@
-	$(HIDE) $(CXX) $(CFLAGS) -c pg -o $@ -MMD -MF $(@:%.o.prof=.depend/$.d) $(firstword $^)
+	$(HIDE) $(CXX) $(CFLAGS) -c -pg -o $@ -MMD -MF $(@:%.o.prof=.depend/$.d) $(firstword $^)
 
 %.o.GC: %.cpp
 	@ mkdir -p .depend
@@ -59,6 +60,10 @@ testtwo: testtwo.o $(COMMON_OBJECTS)
 testtwo.GC: testtwo.o.GC $(COMMON_OBJECTS_GC)
 	@ $(MSG) LD $@
 	$(HIDE) $(LD) $(CFLAGS) $(LDFLAGS) -o $@ $^
+
+testtwo.prof: testtwo.o.prof $(COMMON_OBJECTS_PROF)
+	@ $(MSG) LD $@
+	$(HIDE) $(LD) $(CFLAGS) $(LDFLAGS) -pg -o $@ $^
 
 tests test: $(BINLIST)
 	$(PYTHON) ./test.py
