@@ -39,12 +39,12 @@ default: $(BINLIST)
 %.o.prof: %.cpp
 	@ mkdir -p .depend
 	@ $(MSG) CXX $@
-	$(HIDE) $(CXX) $(CFLAGS) -c -pg -o $@ -MMD -MF $(@:%.o.prof=.depend/$.d) $(firstword $^)
+	$(HIDE) $(CXX) $(CFLAGS) -c -pg -o $@ -MMD -MF $(@:%.o.prof=.depend/%.prof.d) $(firstword $^)
 
 %.o.GC: %.cpp
 	@ mkdir -p .depend
 	@ $(MSG) CXX $@
-	$(HIDE) $(CXX) $(CFLAGS) -c -D USE_GC -o $@ -MMD -MF $(@:%.o.prof=.depend/$.d) $(firstword $^)
+	$(HIDE) $(CXX) $(CFLAGS) -c -D USE_GC -o $@ -MMD -MF $(@:%.o.GC=.depend/%.GC.d) $(firstword $^)
 
 #include generated dependency files
 -include .depend/*.d
@@ -78,7 +78,7 @@ pdf-clean:
 	$(MAKE) -C tex/ clean
 
 main-clean:
-	rm -f *.map *.o *.o.GC $(BINLIST) core.* *.exe.stackdump *.pyc *\~
+	rm -f *.map *.o *.o.GC *.o.prof $(BINLIST) core.* *.exe.stackdump *.pyc *\~
 
 clean: pdf-clean main-clean
 
