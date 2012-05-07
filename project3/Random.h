@@ -13,7 +13,7 @@
 typedef boost::uniform_real<> real_distribution_type;
 typedef boost::uniform_int<> int_distribution_type;
 typedef boost::mt19937 mt_gen;
-typedef boost::variate_generator variate_generator;
+typedef boost::variate_generator<mt_gen, real_distribution_type> real_variate_generator;
 
 #else
 

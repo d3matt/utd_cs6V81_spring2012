@@ -5,6 +5,8 @@
 class Stack
 {
 public:
+    Stack() {};
+    virtual ~Stack() {};
     virtual void push(Node *n) = 0;
     virtual Node* pop() = 0;
 };
