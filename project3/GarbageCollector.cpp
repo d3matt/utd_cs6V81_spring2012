@@ -2,7 +2,7 @@
 #include "GarbageCollector.h"
 using namespace std;
 
-GarbageCollector::GarbageCollector() : clock(1)
+GarbageCollector::GarbageCollector() : clock(1), total_allocs(0)
 {
     pthread_rwlock_init(&mutex, NULL);
 }
@@ -25,6 +25,7 @@ void GarbageCollector::dereg(GCNode *n)
     }
     pthread_rwlock_wrlock(&mutex);
     clocks.remove( &(n->clock) );
+    total_allocs += n->allocs;
     pthread_rwlock_unlock(&mutex);
     delete n;
 }
@@ -57,11 +58,17 @@ void GCNode::clean(Node *n)
         delete n;
         return;
     }
-    count++;
     n->clock = clock;
-    dirty_list.push_back(n);
-    if(count > 10)
+    //10 appears to be a good round number...
+    if(dirty_list.size() > 10)
         cleanup(minclock);
+
+    if(dirty_list.full())
+    {
+        printf("DIRTY LIST FULL\n");
+        _exit(1);
+    }
+    dirty_list.push_back(n);
 }
 
 void GCNode::cleanup(uint64_t minclock)
@@ -75,9 +82,12 @@ void GCNode::cleanup(uint64_t minclock)
         n = dirty_list.front();
         if(n->clock < minclock) {
             dirty_list.pop_front();
-            //clean_list.push_front(n);
-            delete n;
-            count--;
+            if(clean_list.full()) {
+                printf("FULL!\n");
+                delete n;
+            }
+            else
+                clean_list.push_front(n);
         }
         else
             break;
@@ -101,15 +111,16 @@ Node * GCNode::alloc(int32_t data)
 {
     Node *n = NULL;
 
-    if( !clean_list.empty() )
-    {
+    if( !clean_list.empty() ) {
         n = clean_list.front();
         clean_list.pop_front();
         n->data=data;
         n->next=NULL;
         return n;
     }
-    else
+    else {
+        allocs++;
         n = new Node(data);
+    }
     return n;
 }

@@ -11,6 +11,8 @@
 typedef std::list<volatile uint64_t *> UL;
 typedef boost::circular_buffer<Node *> NCIRC;
 
+#define LISTSIZE 1024*1024
+
 class GCNode;
 class GarbageCollector
 {
@@ -23,6 +25,7 @@ public:
     void dereg(GCNode * n);
     uint64_t                getclock();
     uint64_t                getminclock();
+    uint64_t                total_allocs;
 };
 
 class GCNode
@@ -30,11 +33,11 @@ class GCNode
     GarbageCollector   *parent;
     NCIRC               dirty_list;
     NCIRC               clean_list;
-    uint64_t count;
 public:
     uint64_t    clock;
+    uint64_t    allocs;
                 GCNode(GarbageCollector *parent)
-                    :parent(parent), dirty_list(1024), clean_list(10240), count(0) {}
+                    :parent(parent), dirty_list(1024*1024), clean_list(1024*1024), allocs(0) {}
                 ~GCNode();
     void        clean(Node *n);
     void        cleanup(uint64_t minclock);

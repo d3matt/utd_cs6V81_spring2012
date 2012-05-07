@@ -19,6 +19,8 @@ uint64_t totalpushcount, totalpopcount;
 Stack *globalstack;
 #ifdef USE_GC
 GarbageCollector GC;
+#else
+uint64_t total_allocs=0;
 #endif
 
 void *worker(void *args)
@@ -29,6 +31,8 @@ void *worker(void *args)
     timespec *stoptime = &targs->options->stoptime;
     #ifdef USE_GC
     GCNode* gcn = GC.reg();
+    #else
+    uint64_t allocs=0;
     #endif
 
     uint64_t pushcount = 0, popcount = 0;
@@ -55,6 +59,7 @@ void *worker(void *args)
             n = gcn->alloc((tid*10000) + i);
             #else
             n = new Node((tid*10000) + i);
+            allocs++;
             #endif
             stack->push(n);
             DEBUG2("%u pushed: %d\n", tid, n->data);
@@ -86,6 +91,8 @@ void *worker(void *args)
     __sync_fetch_and_add(&totalpopcount, popcount);
     #ifdef USE_GC
     GC.dereg(gcn);
+    #else
+    __sync_fetch_and_add(&total_allocs, allocs);
     #endif
     return NULL;
 }
@@ -111,7 +118,13 @@ int main(int argc, char *argv[])
 
     DEBUG1("%lu pushed, %lu popped, %lu leftover\n", totalpushcount, totalpopcount, mypopcount);
 
-    printf("%lu stack operations\n", totalpushcount + totalpopcount);
+    printf("%lu stack operations... %lu allocs\n", totalpushcount + totalpopcount,
+#ifdef USE_GC
+    GC.total_allocs
+#else
+    total_allocs
+#endif
+    );
 
     return 0;
 }
