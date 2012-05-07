@@ -6,26 +6,10 @@
 #include <pthread.h>
 #include <stdint.h>
 #include "Common.h"
+#include "boost/circular_buffer.hpp"
 
 typedef std::list<volatile uint64_t *> UL;
-typedef std::list< Node * > NLIST;
-
-class GCList
-{
-    Node * arr[10240];
-    uint32_t head;
-    uint32_t tail;
-public:
-    GCList() : head(0), tail(0) {};
-    uint32_t size()
-    {
-        if(head < tail)
-            return (head+10240) - tail;
-        else
-            return head - tail;
-        
-    }
-};
+typedef boost::circular_buffer<Node *> NCIRC;
 
 class GCNode;
 class GarbageCollector
@@ -44,13 +28,13 @@ public:
 class GCNode
 {
     GarbageCollector   *parent;
-    NLIST               dirty_list;
-    NLIST               clean_list;
+    NCIRC               dirty_list;
+    NCIRC               clean_list;
     uint64_t count;
 public:
     uint64_t    clock;
                 GCNode(GarbageCollector *parent)
-                    :parent(parent), count(0) {}
+                    :parent(parent), dirty_list(1024), clean_list(10240), count(0) {}
                 ~GCNode();
     void        clean(Node *n);
     void        cleanup(uint64_t minclock);
