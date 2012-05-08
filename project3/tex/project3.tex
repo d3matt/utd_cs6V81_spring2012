@@ -1,0 +1,70 @@
+
+\documentclass [letterpaper]{article}
+
+\title{Comparison of Stack Algorithms}
+\author{James Hall and Matthew Stoltenberg}
+\date{2012-05-08}
+
+\usepackage{fullpage}
+\usepackage{amsmath}
+\usepackage{graphicx}
+
+\begin{document}
+    \maketitle
+
+    \section{Analysis}
+
+    We approached these problems in the same manner we approached the comparison of locks.
+    We measured performance by counting the number of times the critical section was entered globally.
+    In this case, the critical section is a stack operation (either a \verb+push()+ or a \verb+pop()+).
+
+    We performed the experiments on three different machines.
+    Figure \ref{figure:results02} has two cores, figure \ref{figure:results06} is a six core machine, and figure \ref{figure:results24} is a 24 core NUMA computer.
+
+    \begin{figure}[hp]
+        \caption{Stack operations vs Number of Threads}
+        \begin{center}
+            \includegraphics{results.linux02/test_results.pdf}
+        \end{center}
+        \label{figure:results02}
+    \end{figure}
+
+    \begin{figure}[hp]
+        \caption{Stack operations vs Number of Threads}
+        \begin{center}
+            \includegraphics{results.linux06/test_results.pdf}
+        \end{center}
+        \label{figure:results06}
+    \end{figure}
+
+    \begin{figure}[hp]
+        \caption{Stack operations vs Number of Threads}
+        \begin{center}
+            \includegraphics{results.linux24/test_results.pdf}
+        \end{center}
+        \label{figure:results24}
+    \end{figure}
+
+    As you can see, the performance goes down with the number of threads.
+    Also, the Elimination Backoff stack performs the best comparatively.
+    Although the data is not shown, this trend is only exaggerated as the number of threads far exceeds the number of cores.
+
+    It should be worth mentioning, we included two variations in the Makefile, one that includes garbage collection and one that does not.
+    The garbage collector was written by us, so its performance does not match those of professional quality (Java), but it severely decreases the amount of memory required to run the test.
+    For instance, when running with six threads for 100 seconds, the non-garbage collected version takes close 2GB of RAM, while the garbage collected version takes 100MB.
+
+    \section{Instructions}
+
+    In order to compile our project, just type \verb+make+ on a *nix machine.
+    There are two tests supplied, \verb+testone+ starts the number of threads specified and performs 10000 stack operations.
+    \verb+testtwo+ starts the number of threads specified and runs for the specified amount of time.
+    In both cases, the end of the test reports how many stack operations and how many memory allocations took place.
+    In order to include more print-outs, we included three levels of debug prints, compile using the following to enable: \verb+make -DPROJ_DEBUG<1|2|3>+ where three is the highest debug level.
+
+    Usage:
+
+    \begin{verbatim}
+testone | testtwo [LOCK|LOCKFREE|ELIMINATION] [NUMTHREADS=<n>] [SECONDS=<m>] [HELP]
+    \end{verbatim}
+
+\end{document}
