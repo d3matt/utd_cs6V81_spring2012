@@ -21,6 +21,18 @@
 
 using namespace std;
 
+void usage()
+{
+    cerr << "USAGE:" << endl
+            << "   testone [LOCK|LOCKFREE|ELIMINATION] [NUMTHREADS=<threads>] [SECONDS=<seconds>] [HELP]" << endl
+            << "   LOCK        uses the locking stack"             << endl
+            << "   LOCKFREE    uses the lockfree stack"            << endl
+            << "   ELIMINATION uses the elimination backoff stack" << endl
+            << "   SECONDS     determines how long the test runs"  << endl
+            << "   NUMTHREADS  determines how many threads run"    << endl
+            << "   HELP        prints this message and exits"      << endl;
+}
+
 void parseArgs(Options & options, int argc, char *argv[])
 {
     for(int i = 1; i < argc; i++)
@@ -40,16 +52,15 @@ void parseArgs(Options & options, int argc, char *argv[])
         {
             options.numthreads = boost::lexical_cast<uint32_t>(arg.substr(11));
         }
+        else if(arg.compare(0, 4, "HELP") == 0)
+        {
+            usage();
+            exit(0);
+        }
         else
         {
             cerr << "BAD ARG: " << arg << endl;
-            cerr << "USAGE:" << endl
-                 << "   testone [LOCK|LOCKFREE|ELIMINATION] [NUMTHREADS=<threads>]" << endl
-                 << "   LOCK        uses the locking stack"             << endl
-                 << "   LOCKFREE    uses the lockfree stack"            << endl
-                 << "   ELIMINATION uses the elimination backoff stack" << endl
-                 << "   SECONDS     determines how long the test runs"  << endl
-                 << "   NUMTHREADS  determines how many threads run"    << endl;
+            usage();
             exit(1);
         }
     }    
